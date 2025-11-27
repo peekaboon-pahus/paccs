@@ -3,693 +3,589 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PACCS - Peekaboon Agentic Creative Curation System</title>
+    <title>PACCS - AI Film Intelligence Platform</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
-            min-height: 100vh;
-            padding: 20px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
-        header {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-        h1 { color: #1a365d; font-size: 2.5em; margin-bottom: 10px; }
-        .subtitle { color: #666; font-size: 1.1em; }
-        .powered { color: #2c5282; font-size: 0.9em; margin-top: 10px; font-weight: bold; }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-        }
-        .stat-number { font-size: 2.2em; font-weight: bold; color: #2c5282; }
-        .stat-label { color: #666; margin-top: 5px; font-size: 0.9em; }
-        .section {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-        }
-        .section h2 {
-            color: #1a365d;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        .film-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
-        }
-        .film-card {
-            background: #f8fafc;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .film-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        .film-title { font-weight: bold; color: #1a365d; font-size: 1.15em; margin-bottom: 8px; }
-        .film-meta { color: #666; font-size: 0.9em; margin-bottom: 12px; }
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            margin-right: 5px;
-            margin-bottom: 5px;
-        }
-        .badge-genre { background: #e2e8f0; color: #1a365d; }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.95em;
-            transition: all 0.2s;
-        }
-        .btn-primary { background: #2c5282; color: white; }
-        .btn-primary:hover { background: #1a365d; }
-        .btn-secondary { background: #e2e8f0; color: #1a365d; }
-        .btn-secondary:hover { background: #cbd5e0; }
-        .btn-success { background: #276749; color: white; }
-        .btn-success:hover { background: #22543d; }
-        .actions { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
-        .controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
         
-        /* Enhanced Result Styles */
-        .result {
-            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
-            border: 2px solid #48bb78;
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 15px;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            min-height: 100vh;
+            color: #fff;
         }
-        .result-header {
+        
+        .header {
+            background: rgba(0,0,0,0.3);
+            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        
+        .logo span {
+            color: #48bb78;
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            font-size: 0.9em;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #48bb78;
+        }
+        
+        .main-content {
+            padding: 30px 40px;
+        }
+        
+        .films-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .film-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            color: #1a365d;
+            position: relative;
+        }
+        
+        .film-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #1a365d;
+        }
+        
+        .film-meta {
+            font-size: 0.85em;
+            color: #718096;
+            margin-bottom: 12px;
+        }
+        
+        .film-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
             margin-bottom: 15px;
         }
-        .result-score {
+        
+        .tag {
+            background: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            color: #4a5568;
+        }
+        
+        .analyze-btn {
+            background: linear-gradient(135deg, #2c5282, #1a365d);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .analysis-result {
+            display: none;
+            margin-top: 15px;
+            background: linear-gradient(135deg, #f0fff4, #c6f6d5);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .analysis-result.show {
+            display: block;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        .close-btn:hover {
+            background: #c53030;
+        }
+        
+        .score-display {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .score-number {
             font-size: 2.5em;
             font-weight: bold;
             color: #276749;
         }
-        .result-pathway {
-            background: #2c5282;
+        
+        .pathway-badge {
+            background: #276749;
             color: white;
             padding: 8px 16px;
             border-radius: 20px;
             font-weight: bold;
-        }
-        
-        /* Success Prediction */
-        .prediction-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin: 15px 0;
-        }
-        .prediction-item {
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .prediction-value {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #2c5282;
-        }
-        .prediction-label {
-            font-size: 0.8em;
-            color: #666;
-        }
-        
-        /* Comparison */
-        .comparison-item {
-            background: #edf2f7;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin: 8px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .percentile-badge {
-            background: #2c5282;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-weight: bold;
-        }
-        
-        /* Revenue */
-        .revenue-box {
-            background: linear-gradient(135deg, #faf5ff 0%, #e9d8fd 100%);
-            border: 2px solid #9f7aea;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-        }
-        .revenue-total {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #553c9a;
-            text-align: center;
-        }
-        .revenue-breakdown {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-top: 10px;
             font-size: 0.85em;
         }
         
-        /* Matches */
-        .match-list {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .match-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .match-score {
-            background: #48bb78;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.85em;
-        }
-        
-        /* Report Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            overflow-y: auto;
-        }
-        .modal-content {
-            background: white;
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 30px;
-            border-radius: 15px;
-            position: relative;
-        }
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-        }
-        .modal-close:hover { color: #1a365d; }
-        
-        .report-section {
-            margin: 20px 0;
-            padding: 15px;
-            background: #f8fafc;
-            border-radius: 10px;
-        }
-        .report-section h3 {
-            color: #1a365d;
-            margin-bottom: 10px;
-            border-bottom: 2px solid #2c5282;
-            padding-bottom: 5px;
-        }
-        
-        .loading { text-align: center; padding: 20px; color: #666; }
-        
-        /* Tabs */
         .tabs {
             display: flex;
             gap: 5px;
             margin-bottom: 15px;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 10px;
         }
+        
         .tab {
-            padding: 8px 16px;
-            border: none;
-            background: #e2e8f0;
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .tab.active {
-            background: #2c5282;
+            background: #276749;
             color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
         }
+        
+        .tab:hover, .tab.active {
+            background: #22543d;
+        }
+        
         .tab-content {
             display: none;
         }
+        
         .tab-content.active {
             display: block;
+        }
+        
+        .predictions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .prediction-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .prediction-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #276749;
+        }
+        
+        .prediction-label {
+            font-size: 0.8em;
+            color: #718096;
+        }
+        
+        .view-report-btn {
+            background: #2c5282;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        
+        .view-report-btn:hover {
+            background: #1a365d;
+        }
+        
+        .ranking-content, .revenue-content, .matches-content {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            color: #1a365d;
+        }
+        
+        .ranking-item, .match-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .ranking-item:last-child, .match-item:last-child {
+            border-bottom: none;
+        }
+        
+        .match-score {
+            background: #48bb78;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.85em;
+        }
+        
+        .revenue-range {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #276749;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #276749;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1em;
+        }
+        
+        .filter-btn {
+            background: #4a5568;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🎬 PACCS</h1>
-            <p class="subtitle">Peekaboon Agentic Creative Curation System - Multi-Agent Film Intelligence Platform</p>
-            <p class="powered">Powered by 3 AI Agents | Success Prediction | Revenue Estimation | Festival & Distributor Matching</p>
-        </header>
-        
-        <div class="stats" id="stats">
-            <div class="stat-card">
-                <div class="stat-number" id="total-films">-</div>
-                <div class="stat-label">Total Films</div>
+    <div class="header">
+        <div class="logo">🎬 <span>PACCS</span></div>
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value" id="totalFilms">0</div>
+                <div>Films</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="pending-films">-</div>
-                <div class="stat-label">Pending Review</div>
+            <div class="stat">
+                <div class="stat-value" id="analyzedFilms">0</div>
+                <div>Analyzed</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="reviewed-films">-</div>
-                <div class="stat-label">Reviewed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="avg-confidence">-</div>
-                <div class="stat-label">Avg Confidence</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="avg-score">-</div>
-                <div class="stat-label">Avg Score</div>
-            </div>
-        </div>
-        
-        <div class="section">
-            <h2>🎯 Pending Films</h2>
-            <div class="controls">
-                <button class="btn btn-primary" onclick="batchProcess()">⚡ Process Batch (5 Films)</button>
-                <button class="btn btn-secondary" onclick="loadFilms()">🔄 Refresh</button>
-            </div>
-            <div class="film-grid" id="pending-grid">
-                <div class="loading">Loading films...</div>
-            </div>
-        </div>
-        
-        <div class="section">
-            <h2>✅ Recently Reviewed</h2>
-            <div class="film-grid" id="reviewed-grid">
-                <div class="loading">Loading...</div>
+            <div class="stat">
+                <div class="stat-value" id="avgScore">0</div>
+                <div>Avg Score</div>
             </div>
         </div>
     </div>
     
-    <!-- Report Modal -->
-    <div id="reportModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal()">&times;</span>
-            <div id="reportContent"></div>
+    <div class="main-content">
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search films..." id="searchInput" onkeyup="filterFilms()">
+            <button class="filter-btn" onclick="loadFilms()">🔄 Refresh</button>
+        </div>
+        
+        <div class="films-grid" id="filmsGrid">
+            <!-- Films will be loaded here -->
         </div>
     </div>
-    
+
     <script>
-        let lastDecision = null;
-        
-        document.addEventListener('DOMContentLoaded', loadFilms);
+        let filmsData = [];
         
         async function loadFilms() {
             try {
                 const response = await fetch('/api/films');
                 const data = await response.json();
-                
-                document.getElementById('total-films').textContent = data.stats.total_films;
-                document.getElementById('pending-films').textContent = data.stats.pending;
-                document.getElementById('reviewed-films').textContent = data.stats.reviewed;
-                
-                const statsResponse = await fetch('/api/stats');
-                const statsData = await statsResponse.json();
-                
-                document.getElementById('avg-confidence').textContent = 
-                    statsData.consensus.avg_confidence ? 
-                    (statsData.consensus.avg_confidence * 100).toFixed(0) + '%' : '-';
-                document.getElementById('avg-score').textContent = 
-                    statsData.consensus.avg_score ? 
-                    statsData.consensus.avg_score.toFixed(1) : '-';
-                
-                renderPendingFilms(data.pending);
-                renderReviewedFilms(data.reviewed);
-                
+                filmsData = data.films || [];
+                renderFilms(filmsData);
+                updateStats(data);
             } catch (error) {
                 console.error('Error loading films:', error);
             }
         }
         
-        function renderPendingFilms(films) {
-            const grid = document.getElementById('pending-grid');
-            if (films.length === 0) {
-                grid.innerHTML = '<p>🎉 All films have been reviewed!</p>';
-                return;
-            }
+        function updateStats(data) {
+            document.getElementById('totalFilms').textContent = data.total || 0;
+            document.getElementById('analyzedFilms').textContent = data.analyzed || 0;
+            document.getElementById('avgScore').textContent = data.avg_score ? data.avg_score.toFixed(1) : '0';
+        }
+        
+        function renderFilms(films) {
+            const grid = document.getElementById('filmsGrid');
+            grid.innerHTML = '';
             
-            grid.innerHTML = films.map(film => `
-                <div class="film-card" id="film-${film.id}">
-                    <div class="film-title">${film.title}</div>
-                    <div class="film-meta">
-                        ${film.duration_minutes || '?'} min | ${film.country || 'Unknown'} | ${film.year || ''}
+            films.slice(0, 50).forEach((film, index) => {
+                const card = document.createElement('div');
+                card.className = 'film-card';
+                card.innerHTML = `
+                    <div class="film-title">${film.title || 'Untitled'}</div>
+                    <div class="film-meta">${film.duration || '?'} min | ${film.country || 'Unknown'} | </div>
+                    <div class="film-tags">
+                        <span class="tag">${film.genre || 'General'}</span>
+                        <span class="tag">${film.themes || 'General'}</span>
                     </div>
-                    <div>
-                        <span class="badge badge-genre">${film.genre || 'General'}</span>
-                        ${film.themes ? film.themes.slice(0,2).map(t => `<span class="badge badge-genre">${t}</span>`).join('') : ''}
+                    <button class="analyze-btn" onclick="analyzeFilm(${index}, this)">
+                        🔍 Analyze Film
+                    </button>
+                    <div class="loading" id="loading-${index}">
+                        <div class="spinner"></div>
+                        <div>Analyzing with AI agents...</div>
                     </div>
-                    <div class="actions">
-                        <button class="btn btn-primary" onclick="processFilm('${film.id}')">
-                            🔍 Analyze Film
+                    <div class="analysis-result" id="result-${index}">
+                        <button class="close-btn" onclick="closeAnalysis(${index})">✕</button>
+                        <div class="score-display">
+                            <div class="score-number" id="score-${index}">-</div>
+                            <div class="pathway-badge" id="pathway-${index}">-</div>
+                        </div>
+                        <div class="tabs">
+                            <button class="tab active" onclick="showTab(${index}, 'predictions')">📊 Predictions</button>
+                            <button class="tab" onclick="showTab(${index}, 'ranking')">📈 Ranking</button>
+                            <button class="tab" onclick="showTab(${index}, 'revenue')">💰 Revenue</button>
+                            <button class="tab" onclick="showTab(${index}, 'matches')">🎯 Matches</button>
+                        </div>
+                        <div class="tab-content active" id="predictions-${index}">
+                            <div class="predictions-grid">
+                                <div class="prediction-box">
+                                    <div class="prediction-value" id="festival-${index}">-</div>
+                                    <div class="prediction-label">Festival Selection</div>
+                                </div>
+                                <div class="prediction-box">
+                                    <div class="prediction-value" id="distribution-${index}">-</div>
+                                    <div class="prediction-label">Distribution Deal</div>
+                                </div>
+                                <div class="prediction-box">
+                                    <div class="prediction-value" id="award-${index}">-</div>
+                                    <div class="prediction-label">Award Nomination</div>
+                                </div>
+                                <div class="prediction-box">
+                                    <div class="prediction-value" id="viral-${index}">-</div>
+                                    <div class="prediction-label">Viral Potential</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-content" id="ranking-${index}">
+                            <div class="ranking-content" id="ranking-content-${index}">
+                                Loading...
+                            </div>
+                        </div>
+                        <div class="tab-content" id="revenue-${index}">
+                            <div class="revenue-content" id="revenue-content-${index}">
+                                Loading...
+                            </div>
+                        </div>
+                        <div class="tab-content" id="matches-${index}">
+                            <div class="matches-content" id="matches-content-${index}">
+                                Loading...
+                            </div>
+                        </div>
+                        <button class="view-report-btn" onclick="viewReport(${index})">
+                            📄 View Full Report
                         </button>
                     </div>
-                    <div id="result-${film.id}"></div>
-                </div>
-            `).join('');
+                `;
+                grid.appendChild(card);
+            });
         }
         
-        function renderReviewedFilms(films) {
-            const grid = document.getElementById('reviewed-grid');
-            if (films.length === 0) {
-                grid.innerHTML = '<p>No reviewed films yet. Start analyzing!</p>';
-                return;
-            }
+        function filterFilms() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = filmsData.filter(film => 
+                (film.title && film.title.toLowerCase().includes(search)) ||
+                (film.country && film.country.toLowerCase().includes(search)) ||
+                (film.genre && film.genre.toLowerCase().includes(search))
+            );
+            renderFilms(filtered);
+        }
+        
+        async function analyzeFilm(index, btn) {
+            const loading = document.getElementById(`loading-${index}`);
+            const result = document.getElementById(`result-${index}`);
             
-            grid.innerHTML = films.slice(0, 12).map(film => `
-                <div class="film-card">
-                    <div class="film-title">${film.title}</div>
-                    <div class="film-meta">${film.genre || 'General'} | ${film.country || 'Unknown'}</div>
-                    <span class="badge badge-genre">${film.genre || 'General'}</span>
-                </div>
-            `).join('');
-        }
-        
-        async function processFilm(filmId) {
-            const resultDiv = document.getElementById(`result-${filmId}`);
-            resultDiv.innerHTML = '<div class="loading">🤖 AI Agents analyzing film...</div>';
+            btn.style.display = 'none';
+            loading.classList.add('show');
             
             try {
                 const response = await fetch('/api/process', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ film_id: filmId })
+                    body: JSON.stringify({ film_index: index })
                 });
                 
-                const decision = await response.json();
-                lastDecision = decision;
+                const data = await response.json();
                 
-                // Get predictions and comparisons
-                const sp = decision.success_prediction || {};
-                const comp = decision.comparison || {};
-                const rev = decision.revenue_estimate || {};
+                loading.classList.remove('show');
+                result.classList.add('show');
                 
-                resultDiv.innerHTML = `
-                    <div class="result">
-                        <div class="result-header">
-                            <div class="result-score">${decision.final_score}/10</div>
-                            <div class="result-pathway">${decision.pathway}</div>
-                        </div>
-                        
-                        <div class="tabs">
-                            <button class="tab active" onclick="showTab(this, 'pred-${filmId}')">📊 Predictions</button>
-                            <button class="tab" onclick="showTab(this, 'comp-${filmId}')">📈 Ranking</button>
-                            <button class="tab" onclick="showTab(this, 'rev-${filmId}')">💰 Revenue</button>
-                            <button class="tab" onclick="showTab(this, 'match-${filmId}')">🎯 Matches</button>
-                        </div>
-                        
-                        <div id="pred-${filmId}" class="tab-content active">
-                            <h4>Success Predictions</h4>
-                            <div class="prediction-grid">
-                                <div class="prediction-item">
-                                    <div class="prediction-value">${sp.festival_selection || '?'}%</div>
-                                    <div class="prediction-label">Festival Selection</div>
-                                </div>
-                                <div class="prediction-item">
-                                    <div class="prediction-value">${sp.distribution_deal || '?'}%</div>
-                                    <div class="prediction-label">Distribution Deal</div>
-                                </div>
-                                <div class="prediction-item">
-                                    <div class="prediction-value">${sp.award_nomination || '?'}%</div>
-                                    <div class="prediction-label">Award Nomination</div>
-                                </div>
-                                <div class="prediction-item">
-                                    <div class="prediction-value">${sp.viral_potential || '?'}%</div>
-                                    <div class="prediction-label">Viral Potential</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="comp-${filmId}" class="tab-content">
-                            <h4>How This Film Compares</h4>
-                            ${comp.overall ? `
-                                <div class="comparison-item">
-                                    <span>Overall Ranking</span>
-                                    <span class="percentile-badge">Top ${100 - comp.overall.percentile}%</span>
-                                </div>
-                                <div class="comparison-item">
-                                    <span>In ${comp.by_genre?.genre || 'Genre'}</span>
-                                    <span class="percentile-badge">Top ${100 - (comp.by_genre?.percentile || 50)}%</span>
-                                </div>
-                                <div class="comparison-item">
-                                    <span>${comp.by_duration?.category || 'Duration Category'}</span>
-                                    <span class="percentile-badge">Top ${100 - (comp.by_duration?.percentile || 50)}%</span>
-                                </div>
-                            ` : '<p>Comparison data loading...</p>'}
-                        </div>
-                        
-                        <div id="rev-${filmId}" class="tab-content">
-                            <div class="revenue-box">
-                                <div class="revenue-total">
-                                    💷 £${(rev.low_estimate || 0).toLocaleString()} - £${(rev.high_estimate || 0).toLocaleString()}
-                                </div>
-                                <p style="text-align:center;color:#666;font-size:0.9em;">Estimated Market Value</p>
-                                <div class="revenue-breakdown">
-                                    <div>🎬 Festival: £${(rev.breakdown?.festival_circuit || 0).toLocaleString()}</div>
-                                    <div>📺 Streaming: £${(rev.breakdown?.streaming_rights || 0).toLocaleString()}</div>
-                                    <div>📚 Educational: £${(rev.breakdown?.educational_licensing || 0).toLocaleString()}</div>
-                                    <div>📦 Other: £${(rev.breakdown?.other || 0).toLocaleString()}</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="match-${filmId}" class="tab-content">
-                            <h4>🏆 Top Festival Matches</h4>
-                            <div class="match-list">
-                                ${(decision.festival_matches || []).slice(0,3).map(f => `
-                                    <div class="match-item">
-                                        <span>${f.name}</span>
-                                        <span class="match-score">${f.match_score}%</span>
-                                    </div>
-                                `).join('') || '<p>Processing...</p>'}
-                            </div>
-                            <h4 style="margin-top:15px;">📺 Top Distributor Matches</h4>
-                            <div class="match-list">
-                                ${(decision.distributor_matches || []).slice(0,3).map(d => `
-                                    <div class="match-item">
-                                        <span>${d.name}</span>
-                                        <span class="match-score">${d.match_score}%</span>
-                                    </div>
-                                `).join('') || '<p>Processing...</p>'}
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top:15px;">
-                            <button class="btn btn-success" onclick="viewReport('${filmId}')">
-                                📄 View Full Report
-                            </button>
-                        </div>
+                // Update score and pathway
+                document.getElementById(`score-${index}`).textContent = 
+                    (data.final_score || data.score || 0).toFixed(1) + '/10';
+                document.getElementById(`pathway-${index}`).textContent = 
+                    data.pathway || 'FESTIVAL';
+                
+                // Update predictions
+                const pred = data.success_prediction || {};
+                document.getElementById(`festival-${index}`).textContent = 
+                    (pred.festival_selection || 50) + '%';
+                document.getElementById(`distribution-${index}`).textContent = 
+                    (pred.distribution_deal || 30) + '%';
+                document.getElementById(`award-${index}`).textContent = 
+                    (pred.award_nomination || 10) + '%';
+                document.getElementById(`viral-${index}`).textContent = 
+                    (pred.viral_potential || 5) + '%';
+                
+                // Update ranking
+                const comp = data.comparison || {};
+                const overall = comp.overall || {};
+                document.getElementById(`ranking-content-${index}`).innerHTML = `
+                    <div class="ranking-item">
+                        <span>Overall Ranking</span>
+                        <span>Top ${100 - (overall.percentile || 50)}%</span>
+                    </div>
+                    <div class="ranking-item">
+                        <span>Genre Ranking</span>
+                        <span>Top ${100 - ((comp.genre || {}).percentile || 50)}%</span>
+                    </div>
+                    <div class="ranking-item">
+                        <span>Quality Score</span>
+                        <span>${((data.quality_assessment || {}).score || 7).toFixed(1)}/10</span>
+                    </div>
+                    <div class="ranking-item">
+                        <span>Market Score</span>
+                        <span>${((data.market_assessment || {}).score || 7).toFixed(1)}/10</span>
                     </div>
                 `;
                 
-                setTimeout(loadFilms, 1500);
+                // Update revenue
+                const rev = data.revenue_estimate || {};
+                document.getElementById(`revenue-content-${index}`).innerHTML = `
+                    <div class="revenue-range">£${(rev.low_estimate || 1000).toLocaleString()} - £${(rev.high_estimate || 5000).toLocaleString()}</div>
+                    <div style="text-align: center; color: #718096; font-size: 0.85em;">Estimated Market Value</div>
+                `;
                 
-            } catch (error) {
-                resultDiv.innerHTML = '<div class="result" style="background:#fff5f5;border-color:#fc8181;">Error processing film</div>';
-            }
-        }
-        
-        function showTab(btn, tabId) {
-            // Find parent result div
-            const parent = btn.closest('.result');
-            
-            // Deactivate all tabs in this result
-            parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
-            // Activate clicked tab
-            btn.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-        }
-        
-        function viewReport(filmId) {
-            if (!lastDecision) {
-                alert('Please process a film first');
-                return;
-            }
-            
-            const d = lastDecision;
-            const sp = d.success_prediction || {};
-            const comp = d.comparison || {};
-            const rev = d.revenue_estimate || {};
-            
-            const reportHTML = `
-                <h2 style="color:#1a365d;border-bottom:3px solid #2c5282;padding-bottom:10px;">
-                    📋 PACCS Film Intelligence Report
-                </h2>
-                
-                <div class="report-section">
-                    <h3>🎬 Film Details</h3>
-                    <p><strong>Title:</strong> ${d.film_title}</p>
-                    <p><strong>Director:</strong> ${d.film_data?.director || 'Unknown'}</p>
-                    <p><strong>Country:</strong> ${d.film_data?.country || 'Unknown'}</p>
-                    <p><strong>Duration:</strong> ${d.film_data?.duration || '?'} minutes</p>
-                    <p><strong>Genre:</strong> ${d.film_data?.genre || 'General'}</p>
-                </div>
-                
-                <div class="report-section" style="background:linear-gradient(135deg,#f0fff4,#c6f6d5);">
-                    <h3>📊 PACCS Scores</h3>
-                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:15px;text-align:center;">
-                        <div>
-                            <div style="font-size:2em;font-weight:bold;color:#276749;">${d.final_score}/10</div>
-                            <div>Overall Score</div>
-                        </div>
-                        <div>
-                            <div style="font-size:2em;font-weight:bold;color:#2c5282;">${d.quality_assessment?.score || '?'}/10</div>
-                            <div>Quality</div>
-                        </div>
-                        <div>
-                            <div style="font-size:2em;font-weight:bold;color:#553c9a;">${d.market_assessment?.score || '?'}/10</div>
-                            <div>Market</div>
-                        </div>
-                    </div>
-                    <p style="text-align:center;margin-top:15px;">
-                        <strong>Recommended Pathway:</strong> 
-                        <span style="background:#2c5282;color:white;padding:5px 15px;border-radius:20px;">${d.pathway}</span>
-                    </p>
-                </div>
-                
-                <div class="report-section">
-                    <h3>🎯 Success Predictions</h3>
-                    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
-                        <p>📽️ Festival Selection: <strong>${sp.festival_selection || '?'}%</strong></p>
-                        <p>📺 Distribution Deal: <strong>${sp.distribution_deal || '?'}%</strong></p>
-                        <p>🏆 Award Nomination: <strong>${sp.award_nomination || '?'}%</strong></p>
-                        <p>🚀 Viral Potential: <strong>${sp.viral_potential || '?'}%</strong></p>
-                    </div>
-                </div>
-                
-                <div class="report-section">
-                    <h3>📈 Competitive Ranking</h3>
-                    <p>• Overall: <strong>Top ${100 - (comp.overall?.percentile || 50)}%</strong> of all films</p>
-                    <p>• In Genre: <strong>Top ${100 - (comp.by_genre?.percentile || 50)}%</strong> of ${comp.by_genre?.genre || 'genre'} films</p>
-                    <p>• By Duration: <strong>Top ${100 - (comp.by_duration?.percentile || 50)}%</strong> in category</p>
-                </div>
-                
-                <div class="report-section" style="background:linear-gradient(135deg,#faf5ff,#e9d8fd);">
-                    <h3>💰 Revenue Estimation</h3>
-                    <p style="font-size:1.3em;text-align:center;">
-                        <strong>£${(rev.low_estimate || 0).toLocaleString()} - £${(rev.high_estimate || 0).toLocaleString()}</strong>
-                    </p>
-                    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px;">
-                        <p>🎬 Festival Circuit: £${(rev.breakdown?.festival_circuit || 0).toLocaleString()}</p>
-                        <p>📺 Streaming Rights: £${(rev.breakdown?.streaming_rights || 0).toLocaleString()}</p>
-                        <p>📚 Educational: £${(rev.breakdown?.educational_licensing || 0).toLocaleString()}</p>
-                        <p>📦 Other: £${(rev.breakdown?.other || 0).toLocaleString()}</p>
-                    </div>
-                </div>
-                
-                <div class="report-section">
-                    <h3>🏆 Top Festival Matches</h3>
-                    ${(d.festival_matches || []).slice(0,5).map((f,i) => `
-                        <p>${i+1}. <strong>${f.name}</strong> (${f.country}) - ${f.match_score}% match</p>
-                    `).join('') || '<p>No matches found</p>'}
-                </div>
-                
-                <div class="report-section">
-                    <h3>📺 Top Distributor Matches</h3>
-                    ${(d.distributor_matches || []).slice(0,5).map((dist,i) => `
-                        <p>${i+1}. <strong>${dist.name}</strong> - ${dist.match_score}% match (${dist.territories?.join(', ')})</p>
-                    `).join('') || '<p>No matches found</p>'}
-                </div>
-                
-                <div class="report-section">
-                    <h3>📋 Recommended Next Steps</h3>
-                    ${(d.next_steps || []).map((step,i) => `
-                        <p>${i+1}. ${step}</p>
-                    `).join('') || '<p>Continue building festival presence</p>'}
-                </div>
-                
-                <div style="text-align:center;margin-top:20px;padding:15px;background:#f8fafc;border-radius:10px;">
-                    <p style="color:#666;font-size:0.9em;">
-                        Report generated by PACCS - Peekaboon Agentic Creative Curation System<br>
-                        © ${new Date().getFullYear()} PAHUS Studios Limited
-                    </p>
-                </div>
-            `;
-            
-            document.getElementById('reportContent').innerHTML = reportHTML;
-            document.getElementById('reportModal').style.display = 'block';
-        }
-        
-        function closeModal() {
-            document.getElementById('reportModal').style.display = 'none';
-        }
-        
-        window.onclick = function(event) {
-            const modal = document.getElementById('reportModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        }
-        
-        async function batchProcess() {
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = '⏳ Processing...';
-            
-            try {
-                const response = await fetch('/api/batch', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                // Update matches
+                const festivals = data.festival_matches || [];
+                const distributors = data.distributor_matches || [];
+                let matchesHTML = '<strong>Top Festival Matches:</strong><br>';
+                festivals.slice(0, 3).forEach(f => {
+                    matchesHTML += `<div class="match-item"><span>${f.name}</span><span class="match-score">${f.match_score}%</span></div>`;
                 });
+                matchesHTML += '<br><strong>Top Distributor Matches:</strong><br>';
+                distributors.slice(0, 3).forEach(d => {
+                    matchesHTML += `<div class="match-item"><span>${d.name}</span><span class="match-score">${d.match_score}%</span></div>`;
+                });
+                document.getElementById(`matches-content-${index}`).innerHTML = matchesHTML;
                 
-                const result = await response.json();
-                alert(`✅ Processed ${result.processed} films successfully!`);
-                loadFilms();
+                // Store data for report
+                window[`filmData-${index}`] = data;
                 
             } catch (error) {
-                alert('Error processing batch');
+                console.error('Error:', error);
+                loading.classList.remove('show');
+                btn.style.display = 'flex';
+                alert('Error analyzing film. Please try again.');
             }
-            
-            btn.disabled = false;
-            btn.textContent = '⚡ Process Batch (5 Films)';
         }
+        
+        function closeAnalysis(index) {
+            const result = document.getElementById(`result-${index}`);
+            const btn = result.parentElement.querySelector('.analyze-btn');
+            result.classList.remove('show');
+            btn.style.display = 'flex';
+        }
+        
+        function showTab(index, tabName) {
+            // Hide all tabs
+            document.querySelectorAll(`#result-${index} .tab-content`).forEach(t => t.classList.remove('active'));
+            document.querySelectorAll(`#result-${index} .tab`).forEach(t => t.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(`${tabName}-${index}`).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function viewReport(index) {
+            const data = window[`filmData-${index}`];
+            if (data && data.film_id) {
+                window.open(`/api/report/${data.film_id}/pdf`, '_blank');
+            } else {
+                alert('Please analyze the film first.');
+            }
+        }
+        
+        // Load films on page load
+        loadFilms();
     </script>
 </body>
 </html>
