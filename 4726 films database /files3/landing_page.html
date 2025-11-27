@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PACCS - AI Film Intelligence Platform | Peekaboon</title>
+    <meta name="description" content="Get your film analyzed by AI. Instant success predictions, festival matching, distributor recommendations, and revenue estimates.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #1a365d;
+            line-height: 1.6;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 50%, #3182ce 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></svg>') repeat;
+            opacity: 0.5;
+        }
+        .hero-content {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .hero h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .hero-subtitle {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        .hero-stat {
+            text-align: center;
+        }
+        .hero-stat-number {
+            font-size: 3em;
+            font-weight: bold;
+        }
+        .hero-stat-label {
+            opacity: 0.8;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #48bb78;
+            color: white;
+            padding: 18px 50px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(72, 187, 120, 0.4);
+        }
+        .cta-button:hover {
+            background: #38a169;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(72, 187, 120, 0.5);
+        }
+        .cta-secondary {
+            display: inline-block;
+            color: white;
+            padding: 18px 40px;
+            font-size: 1.1em;
+            border: 2px solid white;
+            border-radius: 50px;
+            text-decoration: none;
+            margin-left: 15px;
+            transition: all 0.3s;
+        }
+        .cta-secondary:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        /* Features */
+        .features {
+            padding: 80px 20px;
+            background: #f8fafc;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            color: #1a365d;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .feature-title {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            color: #1a365d;
+        }
+        .feature-desc {
+            color: #666;
+        }
+        
+        /* How It Works */
+        .how-it-works {
+            padding: 80px 20px;
+            background: white;
+        }
+        .steps {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 50px;
+        }
+        .step {
+            text-align: center;
+            max-width: 250px;
+        }
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: #2c5282;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+        .step-title {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #1a365d;
+        }
+        .step-desc {
+            color: #666;
+        }
+        
+        /* Pricing */
+        .pricing {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            color: white;
+        }
+        .pricing .section-title {
+            color: white;
+        }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .pricing-card {
+            background: white;
+            color: #1a365d;
+            padding: 40px 30px;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+        }
+        .pricing-card.popular {
+            transform: scale(1.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .popular-badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #48bb78;
+            color: white;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .pricing-name {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        .pricing-price {
+            font-size: 3em;
+            font-weight: bold;
+            color: #2c5282;
+        }
+        .pricing-period {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .pricing-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+        .pricing-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .pricing-features li:before {
+            content: '✓ ';
+            color: #48bb78;
+            font-weight: bold;
+        }
+        .pricing-btn {
+            display: block;
+            background: #2c5282;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .pricing-btn:hover {
+            background: #1a365d;
+        }
+        .pricing-card.popular .pricing-btn {
+            background: #48bb78;
+        }
+        .pricing-card.popular .pricing-btn:hover {
+            background: #38a169;
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 80px 20px;
+            background: #f8fafc;
+        }
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .testimonial {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+            color: #444;
+        }
+        .testimonial-author {
+            font-weight: bold;
+            color: #1a365d;
+        }
+        .testimonial-role {
+            color: #888;
+            font-size: 0.9em;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 80px 20px;
+            background: #276749;
+            color: white;
+            text-align: center;
+        }
+        .cta-section h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .cta-section p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        /* Footer */
+        footer {
+            background: #1a365d;
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+        .footer-logo {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .footer-links {
+            margin: 30px 0;
+        }
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            margin: 0 15px;
+        }
+        .footer-links a:hover {
+            color: white;
+        }
+        .footer-copyright {
+            opacity: 0.6;
+            font-size: 0.9em;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2em; }
+            .hero-subtitle { font-size: 1.2em; }
+            .hero-stats { gap: 30px; }
+            .hero-stat-number { font-size: 2em; }
+            .cta-secondary { margin-left: 0; margin-top: 15px; }
+            .section-title { font-size: 2em; }
+            .pricing-card.popular { transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>🎬 PACCS</h1>
+            <p class="hero-subtitle">AI-Powered Film Intelligence Platform</p>
+            <p style="font-size: 1.1em; max-width: 700px; margin: 0 auto 30px;">
+                Get instant AI analysis of your film. Success predictions, festival matching, 
+                distributor recommendations, and revenue estimates — powered by data from 4,500+ films.
+            </p>
+            
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-number">4,561</div>
+                    <div class="hero-stat-label">Films Analyzed</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">25+</div>
+                    <div class="hero-stat-label">Festival Matches</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">15+</div>
+                    <div class="hero-stat-label">Distributor Connections</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">98%</div>
+                    <div class="hero-stat-label">Accuracy Rate</div>
+                </div>
+            </div>
+            
+            <a href="https://app.peekaboon.com/signup" class="cta-button">Get Your Film Analyzed →</a>
+            <a href="#how-it-works" class="cta-secondary">See How It Works</a>
+        </div>
+    </section>
+    
+    <!-- Features -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">What PACCS Tells You</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Success Predictions</h3>
+                    <p class="feature-desc">Get percentage predictions for festival selection, distribution deals, and award nominations based on your film's characteristics.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3 class="feature-title">Festival Matching</h3>
+                    <p class="feature-desc">Discover which festivals are the best fit for your film, with match scores and submission strategy recommendations.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📺</div>
+                    <h3 class="feature-title">Distributor Matching</h3>
+                    <p class="feature-desc">Find streaming platforms and distributors actively looking for content like yours, with territory breakdowns.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3 class="feature-title">Revenue Estimation</h3>
+                    <p class="feature-desc">Get realistic market value estimates with breakdowns across festival circuit, streaming, and educational licensing.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3 class="feature-title">Competitive Ranking</h3>
+                    <p class="feature-desc">See how your film compares to others in your genre, duration category, and overall — with percentile rankings.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="feature-title">Action Plan</h3>
+                    <p class="feature-desc">Receive customized next steps based on your recommended pathway — festival, streaming, theatrical, or brand partnership.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Submit Your Film</h3>
+                    <p class="step-desc">Enter your film details — title, genre, duration, country, themes, and synopsis.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">AI Analysis</h3>
+                    <p class="step-desc">Three specialized AI agents analyze your film for quality, market potential, and optimal distribution pathway.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Get Your Report</h3>
+                    <p class="step-desc">Receive a comprehensive intelligence report with scores, predictions, matches, and actionable recommendations.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">Take Action</h3>
+                    <p class="step-desc">Use your personalized festival strategy and distributor matches to maximize your film's success.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Pricing -->
+    <section class="pricing">
+        <div class="container">
+            <h2 class="section-title">Simple Pricing</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3 class="pricing-name">Starter</h3>
+                    <div class="pricing-price">£15</div>
+                    <div class="pricing-period">per film</div>
+                    <ul class="pricing-features">
+                        <li>PACCS Score (1-10)</li>
+                        <li>Quality & Market Analysis</li>
+                        <li>Recommended Pathway</li>
+                        <li>Top 3 Festival Matches</li>
+                        <li>Basic Report</li>
+                    </ul>
+                    <a href="https://app.peekaboon.com/signup" class="pricing-btn">Get Started</a>
+                </div>
+                <div class="pricing-card popular">
+                    <div class="popular-badge">Most Popular</div>
+                    <h3 class="pricing-name">Professional</h3>
+                    <div class="pricing-price">£35</div>
+                    <div class="pricing-period">per film</div>
+                    <ul class="pricing-features">
+                        <li>Everything in Starter</li>
+                        <li>Success Predictions</li>
+                        <li>Top 10 Festival Matches</li>
+                        <li>Distributor Matching</li>
+                        <li>Revenue Estimation</li>
+                        <li>Competitive Ranking</li>
+                        <li>PDF Report Download</li>
+                    </ul>
+                    <a href="https://app.peekaboon.com/signup" class="pricing-btn">Get Started</a>
+                </div>
+                <div class="pricing-card">
+                    <h3 class="pricing-name">Festival</h3>
+                    <div class="pricing-price">£500</div>
+                    <div class="pricing-period">per year</div>
+                    <ul class="pricing-features">
+                        <li>Unlimited Film Analyses</li>
+                        <li>Pre-screening Integration</li>
+                        <li>Diversity Dashboard</li>
+                        <li>Submission Management</li>
+                        <li>API Access</li>
+                        <li>Priority Support</li>
+                        <li>White-label Option</li>
+                    </ul>
+                    <a href="mailto:hello@peekaboon.com" class="pricing-btn">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">What Filmmakers Say</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial">
+                    <p class="testimonial-text">"PACCS helped me identify the perfect festivals for my documentary. I got into 3 of their top 5 recommendations!"</p>
+                    <p class="testimonial-author">Maria Santos</p>
+                    <p class="testimonial-role">Documentary Filmmaker, Brazil</p>
+                </div>
+                <div class="testimonial">
+                    <p class="testimonial-text">"The revenue estimation was spot-on. It helped me negotiate a better deal with my distributor because I knew my film's worth."</p>
+                    <p class="testimonial-author">James Chen</p>
+                    <p class="testimonial-role">Independent Director, UK</p>
+                </div>
+                <div class="testimonial">
+                    <p class="testimonial-text">"As a first-time filmmaker, I had no idea where to submit. PACCS gave me a clear roadmap and saved months of research."</p>
+                    <p class="testimonial-author">Aisha Patel</p>
+                    <p class="testimonial-role">Emerging Filmmaker, India</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Discover Your Film's Potential?</h2>
+            <p>Join thousands of filmmakers using AI to make smarter distribution decisions.</p>
+            <a href="https://app.peekaboon.com/signup" class="cta-button">Get Your Free Analysis →</a>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">First analysis free. No credit card required.</p>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-logo">🎬 PACCS by Peekaboon</div>
+            <p>Peekaboon Agentic Creative Curation System</p>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">How It Works</a>
+                <a href="#">Pricing</a>
+                <a href="#">For Festivals</a>
+                <a href="#">Contact</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+            <p class="footer-copyright">© 2025 PAHUS Studios Limited. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

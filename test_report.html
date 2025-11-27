@@ -1,0 +1,474 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PACCS Film Intelligence Report - Back to</title>
+    <style>
+        @page { margin: 0.5in; }
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none; }
+            .page-break { page-break-before: always; }
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #1a365d;
+            line-height: 1.6;
+            background: white;
+        }
+        
+        .report {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            border-bottom: 4px solid #2c5282;
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #1a365d;
+            margin-bottom: 5px;
+        }
+        .logo-sub {
+            color: #666;
+            font-size: 1em;
+        }
+        .report-title {
+            font-size: 1.3em;
+            color: #2c5282;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .report-date {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        /* Film Info */
+        .film-info {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        .film-title {
+            font-size: 1.8em;
+            color: #1a365d;
+            margin-bottom: 15px;
+        }
+        .film-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .meta-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #cbd5e0;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #2c5282;
+        }
+        
+        /* Score Box */
+        .score-box {
+            background: linear-gradient(135deg, #276749 0%, #2f855a 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .main-score {
+            font-size: 4em;
+            font-weight: bold;
+        }
+        .score-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .pathway-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 25px;
+            border-radius: 25px;
+            margin-top: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        
+        /* Scores Grid */
+        .scores-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .score-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+        }
+        .score-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c5282;
+        }
+        .score-name {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        /* Section */
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 4px solid #2c5282;
+        }
+        .section h2 {
+            color: #1a365d;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        /* Predictions */
+        .predictions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .prediction {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        .prediction-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #276749;
+        }
+        .prediction-label {
+            color: #666;
+            font-size: 0.85em;
+        }
+        
+        /* Revenue */
+        .revenue-box {
+            background: linear-gradient(135deg, #553c9a 0%, #6b46c1 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .revenue-total {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .revenue-breakdown {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            text-align: left;
+        }
+        .revenue-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        /* Matches */
+        .match-list {
+            list-style: none;
+        }
+        .match-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .match-name {
+            font-weight: bold;
+            color: #1a365d;
+        }
+        .match-score {
+            background: #48bb78;
+            color: white;
+            padding: 3px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+        
+        /* Comparison */
+        .comparison-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .percentile {
+            background: #2c5282;
+            color: white;
+            padding: 3px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+        
+        /* Next Steps */
+        .steps-list {
+            list-style: none;
+            counter-reset: steps;
+        }
+        .step {
+            counter-increment: steps;
+            padding: 12px 15px 12px 50px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            position: relative;
+            border: 1px solid #e2e8f0;
+        }
+        .step:before {
+            content: counter(steps);
+            position: absolute;
+            left: 15px;
+            background: #2c5282;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+            color: #888;
+            font-size: 0.85em;
+        }
+        .footer-logo {
+            font-weight: bold;
+            color: #1a365d;
+            font-size: 1.1em;
+        }
+        
+        /* Print Button */
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2c5282;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .print-btn:hover {
+            background: #1a365d;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn no-print" onclick="window.print()">📄 Download PDF</button>
+    
+    <div class="report">
+        <div class="header">
+            <div class="logo">🎬 PACCS</div>
+            <div class="logo-sub">Peekaboon Agentic Creative Curation System</div>
+            <div class="report-title">Film Intelligence Report</div>
+            <div class="report-date">Generated: November 27, 2025 at 00:39</div>
+        </div>
+        
+        <div class="film-info">
+            <div class="film-title">Back to</div>
+            <div class="film-meta">
+                <div class="meta-item"><span class="meta-label">Director:</span> Salah Uddin Shuvo</div>
+                <div class="meta-item"><span class="meta-label">Country:</span> Bangladesh</div>
+                <div class="meta-item"><span class="meta-label">Duration:</span> 5 minutes</div>
+                <div class="meta-item"><span class="meta-label">Genre:</span> General</div>
+                <div class="meta-item"><span class="meta-label">Themes:</span> General</div>
+                <div class="meta-item"><span class="meta-label">Report ID:</span> PACCS-FILM_0001-20251127</div>
+            </div>
+        </div>
+        
+        <div class="score-box">
+            <div class="main-score">8.7/10</div>
+            <div class="score-label">PACCS Score</div>
+            <div class="pathway-badge">FESTIVAL</div>
+        </div>
+        
+        <div class="scores-grid">
+            <div class="score-card">
+                <div class="score-value">9.4/10</div>
+                <div class="score-name">Quality Score</div>
+            </div>
+            <div class="score-card">
+                <div class="score-value">8.0/10</div>
+                <div class="score-name">Market Score</div>
+            </div>
+            <div class="score-card">
+                <div class="score-value">90%</div>
+                <div class="score-name">Confidence Level</div>
+            </div>
+            <div class="score-card">
+                <div class="score-value">Top 7%</div>
+                <div class="score-name">Overall Ranking</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🎯 Success Predictions</h2>
+            <div class="predictions">
+                <div class="prediction">
+                    <div class="prediction-value">98%</div>
+                    <div class="prediction-label">Festival Selection</div>
+                </div>
+                <div class="prediction">
+                    <div class="prediction-value">57%</div>
+                    <div class="prediction-label">Distribution Deal</div>
+                </div>
+                <div class="prediction">
+                    <div class="prediction-value">19%</div>
+                    <div class="prediction-label">Award Nomination</div>
+                </div>
+                <div class="prediction">
+                    <div class="prediction-value">5%</div>
+                    <div class="prediction-label">Viral Potential</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="revenue-box">
+            <div>💰 Estimated Market Value</div>
+            <div class="revenue-total">£1,700.0 - £4,200.0</div>
+            <div class="revenue-breakdown">
+                <div class="revenue-item">🎬 Festival Circuit: £800.0</div>
+                <div class="revenue-item">📺 Streaming Rights: £1,400.0</div>
+                <div class="revenue-item">📚 Educational: £400.0</div>
+                <div class="revenue-item">📦 Other: £100.0</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📈 Competitive Ranking</h2>
+            <div class="comparison-item">
+                <span>Overall (All Films)</span>
+                <span class="percentile">Top 7%</span>
+            </div>
+            <div class="comparison-item">
+                <span>In General Genre</span>
+                <span class="percentile">Top 11%</span>
+            </div>
+            <div class="comparison-item">
+                <span>By Duration Category</span>
+                <span class="percentile">Top 15%</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🏆 Top Festival Matches</h2>
+            <ul class="match-list">
+                
+                <li class="match-item">
+                    <span class="match-name">Clermont-Ferrand Short Film Festival (France)</span>
+                    <span class="match-score">93% match</span>
+                </li>
+            
+                <li class="match-item">
+                    <span class="match-name">Palm Springs ShortFest (USA)</span>
+                    <span class="match-score">93% match</span>
+                </li>
+            
+                <li class="match-item">
+                    <span class="match-name">Tampere Film Festival (Finland)</span>
+                    <span class="match-score">93% match</span>
+                </li>
+            
+                <li class="match-item">
+                    <span class="match-name">Mumbai Film Festival (India)</span>
+                    <span class="match-score">93% match</span>
+                </li>
+            
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>📺 Top Distributor Matches</h2>
+            <ul class="match-list">
+                
+                <li class="match-item">
+                    <span class="match-name">Shorts TV (Global)</span>
+                    <span class="match-score">80% match</span>
+                </li>
+            
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>📋 Recommended Next Steps</h2>
+            <ul class="steps-list">
+                <li class="step">Submit to Clermont-Ferrand Short Film Festival</li><li class="step">Prepare press kit</li><li class="step">Create festival trailer</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>💪 Strengths</h2>
+            <ul class="match-list">
+                <li class="match-item"><span>✓ Strong technical execution</span></li><li class="match-item"><span>✓ Compelling narrative structure</span></li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>🎯 Areas for Development</h2>
+            <ul class="match-list">
+                <li class="match-item"><span>→ Consider more unique angle</span></li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-logo">🎬 PACCS by PAHUS Studios Limited</div>
+            <p>Peekaboon Agentic Creative Curation System</p>
+            <p>www.peekaboon.com | © 2025 All Rights Reserved</p>
+            <p style="margin-top: 15px; font-style: italic;">
+                This report is generated by AI-powered multi-agent analysis. 
+                Scores and recommendations are based on pattern recognition from historical data 
+                and should be used as guidance only.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
