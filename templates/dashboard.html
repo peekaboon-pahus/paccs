@@ -40,6 +40,11 @@
             padding: 8px 20px;
             border-radius: 20px;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.1);
         }
         
         .main-content {
@@ -61,13 +66,27 @@
             margin-bottom: 10px;
         }
         
-        .welcome-section p { color: #718096; }
+        .welcome-section p {
+            color: #718096;
+        }
         
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             margin-bottom: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 500px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         .stat-card {
@@ -78,15 +97,34 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         
-        .stat-icon { font-size: 2em; margin-bottom: 10px; }
-        .stat-value { font-size: 2em; font-weight: bold; color: #1a365d; }
-        .stat-label { color: #718096; font-size: 0.9em; }
+        .stat-card .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
         
-        .actions-section {
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #1a365d;
+        }
+        
+        .stat-card .label {
+            color: #718096;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .action-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         .action-card {
@@ -96,7 +134,10 @@
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
         
         .action-card:hover {
@@ -104,9 +145,20 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
         
-        .action-icon { font-size: 2.5em; margin-bottom: 15px; }
-        .action-card h3 { color: #1a365d; margin-bottom: 10px; }
-        .action-card p { color: #718096; font-size: 0.9em; }
+        .action-card .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .action-card h3 {
+            color: #1a365d;
+            margin-bottom: 10px;
+        }
+        
+        .action-card p {
+            color: #718096;
+            font-size: 0.9em;
+        }
         
         .recent-section {
             background: white;
@@ -120,9 +172,11 @@
             margin-bottom: 20px;
         }
         
-        .film-list { list-style: none; }
+        .recent-list {
+            list-style: none;
+        }
         
-        .film-item {
+        .recent-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -130,15 +184,24 @@
             border-bottom: 1px solid #e2e8f0;
         }
         
-        .film-item:last-child { border-bottom: none; }
+        .recent-item:last-child {
+            border-bottom: none;
+        }
         
-        .film-info h4 { color: #1a365d; margin-bottom: 5px; }
-        .film-info p { color: #718096; font-size: 0.85em; }
+        .recent-item .film-info h4 {
+            color: #1a365d;
+            margin-bottom: 5px;
+        }
         
-        .film-score {
-            background: linear-gradient(135deg, #48bb78, #38a169);
+        .recent-item .film-info p {
+            color: #718096;
+            font-size: 0.85em;
+        }
+        
+        .recent-item .score {
+            background: #48bb78;
             color: white;
-            padding: 8px 16px;
+            padding: 8px 15px;
             border-radius: 20px;
             font-weight: bold;
         }
@@ -150,139 +213,148 @@
         }
         
         .empty-state a {
-            color: #48bb78;
+            color: #e53e3e;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 500;
         }
         
-        @media (max-width: 768px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .actions-section { grid-template-columns: 1fr; }
+        .empty-state a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="header">
+    <header class="header">
         <div class="logo">🎬 <span>PACCS</span></div>
         <div class="user-info">
-            <span class="user-name" id="userName">User</span>
-            <span class="credits-badge" id="userCredits">0 Credits</span>
+            <span class="user-name" id="userName">Loading...</span>
+            <span class="credits-badge" id="creditsDisplay">0 Credits</span>
             <button class="btn-logout" onclick="logout()">Logout</button>
         </div>
-    </div>
+    </header>
     
-    <div class="main-content">
-        <div class="welcome-section">
-            <h1>Welcome back, <span id="welcomeName">Filmmaker</span>! 👋</h1>
+    <main class="main-content">
+        <section class="welcome-section">
+            <h1 id="welcomeMessage">Welcome back! 👋</h1>
             <p>Ready to analyze your next film?</p>
-        </div>
+        </section>
         
-        <div class="stats-grid">
+        <section class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon">🎬</div>
-                <div class="stat-value" id="filmsAnalyzed">0</div>
-                <div class="stat-label">Films Analyzed</div>
+                <div class="icon">🎬</div>
+                <div class="number" id="filmsAnalyzed">0</div>
+                <div class="label">Films Analyzed</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">⭐</div>
-                <div class="stat-value" id="avgScore">-</div>
-                <div class="stat-label">Average Score</div>
+                <div class="icon">⭐</div>
+                <div class="number" id="avgScore">-</div>
+                <div class="label">Average Score</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">🎪</div>
-                <div class="stat-value" id="festivalMatches">0</div>
-                <div class="stat-label">Festival Matches</div>
+                <div class="icon">🏆</div>
+                <div class="number" id="festivalMatches">0</div>
+                <div class="label">Festival Matches</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">💳</div>
-                <div class="stat-value" id="creditsLeft">0</div>
-                <div class="stat-label">Credits Left</div>
+                <div class="icon">🎟️</div>
+                <div class="number" id="creditsLeft">0</div>
+                <div class="label">Credits Left</div>
             </div>
-        </div>
+        </section>
         
-        <div class="actions-section">
-            <div class="action-card" onclick="window.location.href='/analyze'">
-                <div class="action-icon">🔍</div>
+        <section class="action-grid">
+            <a href="/browse" class="action-card">
+                <div class="icon">🔍</div>
                 <h3>Analyze Film</h3>
                 <p>Get instant AI analysis of your film</p>
-            </div>
-            <div class="action-card" onclick="window.location.href='/submit'">
-                <div class="action-icon">📤</div>
+            </a>
+            <a href="/submit" class="action-card">
+                <div class="icon">📤</div>
                 <h3>Submit Film</h3>
                 <p>Upload your film for analysis</p>
-            </div>
-            <div class="action-card" onclick="window.location.href='/browse'">
-                <div class="action-icon">🎞️</div>
+            </a>
+            <a href="/browse" class="action-card">
+                <div class="icon">🎞️</div>
                 <h3>Browse Films</h3>
                 <p>Explore 4,700+ analyzed films</p>
-            </div>
-        </div>
+            </a>
+        </section>
         
-        <div class="recent-section">
+        <section class="recent-section">
             <h2>Your Recent Analyses</h2>
-            <ul class="film-list" id="recentFilms">
-                <li class="empty-state">
-                    No films analyzed yet. <a href="/analyze">Analyze your first film →</a>
-                </li>
+            <ul class="recent-list" id="recentList">
             </ul>
-        </div>
-    </div>
+        </section>
+    </main>
     
     <script>
-        function loadUser() {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const user = JSON.parse(localStorage.getItem('paccs_user') || 'null');
+        
+        if (!user) {
+            window.location.href = '/login';
+        } else {
+            document.getElementById('userName').textContent = user.name || user.email;
+            document.getElementById('welcomeMessage').textContent = `Welcome back, ${user.name || 'Filmmaker'}! 👋`;
+            loadUserStats();
+        }
+        
+        async function loadUserStats() {
+            try {
+                const response = await fetch('/api/user/stats', {
+                    headers: {
+                        'X-User-Email': user.email
+                    }
+                });
+                const data = await response.json();
+                
+                const filmsCount = data.films_analyzed || 0;
+                document.getElementById('filmsAnalyzed').textContent = filmsCount;
+                
+                if (filmsCount > 0 && data.avg_score) {
+                    document.getElementById('avgScore').textContent = data.avg_score.toFixed(1);
+                } else {
+                    document.getElementById('avgScore').textContent = '-';
+                }
+                
+                document.getElementById('festivalMatches').textContent = data.festival_matches || 0;
+                document.getElementById('creditsLeft').textContent = data.credits || 0;
+                document.getElementById('creditsDisplay').textContent = `${data.credits || 0} Credits`;
+                
+                loadRecentAnalyses(data.recent || []);
+                
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                document.getElementById('avgScore').textContent = '-';
+            }
+        }
+        
+        function loadRecentAnalyses(recent) {
+            const listEl = document.getElementById('recentList');
             
-            if (!user.email) {
-                window.location.href = '/login';
+            if (!recent || recent.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        No films analyzed yet. <a href="/browse">Analyze your first film →</a>
+                    </div>
+                `;
                 return;
             }
             
-            document.getElementById('userName').textContent = user.name || 'User';
-            document.getElementById('welcomeName').textContent = user.name ? user.name.split(' ')[0] : 'Filmmaker';
-            document.getElementById('userCredits').textContent = (user.credits || 0) + ' Credits';
-            document.getElementById('creditsLeft').textContent = user.credits || 0;
-            
-            loadUserStats(user.email);
-        }
-        
-        async function loadUserStats(email) {
-            try {
-                const response = await fetch(`/api/user/stats?email=${email}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('filmsAnalyzed').textContent = data.films_analyzed || 0;
-                    document.getElementById('avgScore').textContent = data.avg_score ? data.avg_score.toFixed(1) : '-';
-                    document.getElementById('festivalMatches').textContent = data.festival_matches || 0;
-                    
-                    if (data.recent_films && data.recent_films.length > 0) {
-                        renderRecentFilms(data.recent_films);
-                    }
-                }
-            } catch (error) {
-                console.log('Could not load stats');
-            }
-        }
-        
-        function renderRecentFilms(films) {
-            const list = document.getElementById('recentFilms');
-            list.innerHTML = films.map(film => `
-                <li class="film-item">
+            listEl.innerHTML = recent.map(film => `
+                <li class="recent-item">
                     <div class="film-info">
                         <h4>${film.title}</h4>
-                        <p>Analyzed on ${new Date(film.date).toLocaleDateString()}</p>
+                        <p>${film.date || 'Recently'} • ${film.pathway || 'Festival'}</p>
                     </div>
-                    <span class="film-score">${film.score}/10</span>
+                    <span class="score">${film.score}/10</span>
                 </li>
             `).join('');
         }
         
         function logout() {
-            localStorage.removeItem('user');
+            localStorage.removeItem('paccs_user');
             window.location.href = '/';
         }
-        
-        loadUser();
     </script>
 </body>
 </html>

@@ -13,170 +13,253 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
         
         .login-container {
             background: white;
-            padding: 50px;
+            padding: 40px;
             border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             width: 100%;
             max-width: 420px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
         
         .logo {
             text-align: center;
-            font-size: 2em;
-            font-weight: bold;
-            color: #1a365d;
-            margin-bottom: 10px;
+            margin-bottom: 30px;
         }
         
-        .logo span { color: #48bb78; }
-        
-        .subtitle {
-            text-align: center;
-            color: #718096;
-            margin-bottom: 35px;
-        }
+        .logo-icon { font-size: 3em; margin-bottom: 10px; }
+        .logo h1 { color: #48bb78; font-size: 2em; margin-bottom: 5px; }
+        .logo p { color: #718096; font-size: 0.95em; }
         
         .form-group {
-            margin-bottom: 22px;
+            margin-bottom: 20px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #4a5568;
+            color: #1a365d;
             font-weight: 500;
+            margin-bottom: 8px;
         }
         
         .form-group input {
             width: 100%;
-            padding: 14px 18px;
+            padding: 14px 16px;
             border: 2px solid #e2e8f0;
             border-radius: 10px;
             font-size: 1em;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
         }
         
         .form-group input:focus {
             outline: none;
             border-color: #48bb78;
+            box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin-top: 8px;
+        }
+        
+        .forgot-password a {
+            color: #718096;
+            font-size: 0.85em;
+            text-decoration: none;
         }
         
         .btn-login {
             width: 100%;
+            padding: 14px;
             background: linear-gradient(135deg, #1a365d, #2d3748);
             color: white;
-            padding: 16px;
             border: none;
             border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: bold;
+            font-size: 1em;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s;
         }
         
         .btn-login:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(26, 54, 93, 0.3);
+        }
+        
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
         }
         
         .divider {
-            text-align: center;
+            display: flex;
+            align-items: center;
             margin: 25px 0;
             color: #a0aec0;
-            position: relative;
+            font-size: 0.9em;
         }
         
-        .divider::before, .divider::after {
+        .divider::before,
+        .divider::after {
             content: '';
-            position: absolute;
-            top: 50%;
-            width: 40%;
+            flex: 1;
             height: 1px;
             background: #e2e8f0;
         }
         
-        .divider::before { left: 0; }
-        .divider::after { right: 0; }
+        .divider span { padding: 0 15px; }
+        
+        .social-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .btn-social {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: white;
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #1a365d;
+        }
+        
+        .btn-social:hover {
+            border-color: #cbd5e0;
+            background: #f7fafc;
+        }
+        
+        .btn-apple {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+        
+        .btn-apple:hover {
+            background: #1a1a1a;
+        }
         
         .signup-link {
             text-align: center;
+            margin-top: 25px;
             color: #718096;
         }
         
         .signup-link a {
-            color: #48bb78;
+            color: #e53e3e;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 600;
         }
         
         .error-message {
             background: #fed7d7;
             color: #c53030;
-            padding: 12px;
+            padding: 12px 15px;
             border-radius: 8px;
             margin-bottom: 20px;
+            font-size: 0.9em;
             display: none;
         }
         
-        .forgot-link {
-            text-align: right;
-            margin-top: -15px;
+        .success-message {
+            background: #c6f6d5;
+            color: #276749;
+            padding: 12px 15px;
+            border-radius: 8px;
             margin-bottom: 20px;
-        }
-        
-        .forgot-link a {
-            color: #718096;
-            text-decoration: none;
             font-size: 0.9em;
-        }
-        
-        .forgot-link a:hover {
-            color: #48bb78;
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <div class="logo">🎬 <span>PACCS</span></div>
-        <p class="subtitle">Welcome back!</p>
+        <div class="logo">
+            <div class="logo-icon">🎬</div>
+            <h1>PACCS</h1>
+            <p>Welcome back!</p>
+        </div>
         
         <div class="error-message" id="errorMsg"></div>
+        <div class="success-message" id="successMsg"></div>
         
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" id="email" placeholder="you@example.com" required>
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
             </div>
             
             <div class="form-group">
-                <label>Password</label>
+                <label for="password">Password</label>
                 <input type="password" id="password" placeholder="Enter your password" required>
+                <div class="forgot-password">
+                    <a href="#">Forgot password?</a>
+                </div>
             </div>
             
-            <div class="forgot-link">
-                <a href="#">Forgot password?</a>
-            </div>
-            
-            <button type="submit" class="btn-login">Log In →</button>
+            <button type="submit" class="btn-login" id="loginBtn">
+                Log In →
+            </button>
         </form>
         
-        <div class="divider">or</div>
+        <div class="divider"><span>or</span></div>
         
-        <p class="signup-link">Don't have an account? <a href="/signup">Sign up free</a></p>
+        <div class="social-buttons">
+            <button class="btn-social btn-google" onclick="loginWithGoogle()">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Continue with Google
+            </button>
+            
+            <button class="btn-social btn-apple" onclick="loginWithApple()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                </svg>
+                Continue with Apple
+            </button>
+        </div>
+        
+        <div class="signup-link">
+            Don't have an account? <a href="/signup">Sign up free</a>
+        </div>
     </div>
     
     <script>
+        const existingUser = localStorage.getItem('paccs_user');
+        if (existingUser) {
+            window.location.href = '/dashboard';
+        }
+        
         async function handleLogin(e) {
             e.preventDefault();
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
             const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
             
             errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            
+            btn.disabled = true;
+            btn.innerHTML = 'Logging in...';
             
             try {
                 const response = await fetch('/api/login', {
@@ -188,16 +271,30 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    window.location.href = '/dashboard';
+                    localStorage.setItem('paccs_user', JSON.stringify(data.user));
+                    successMsg.textContent = 'Login successful! Redirecting...';
+                    successMsg.style.display = 'block';
+                    setTimeout(() => { window.location.href = '/dashboard'; }, 1000);
                 } else {
-                    errorMsg.textContent = data.error || 'Login failed';
+                    errorMsg.textContent = data.error || 'Invalid email or password';
                     errorMsg.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = 'Log In →';
                 }
             } catch (error) {
                 errorMsg.textContent = 'Connection error. Please try again.';
                 errorMsg.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = 'Log In →';
             }
+        }
+        
+        function loginWithGoogle() {
+            alert('Google login coming soon! Please use email/password for now.');
+        }
+        
+        function loginWithApple() {
+            alert('Apple login coming soon! Please use email/password for now.');
         }
     </script>
 </body>
