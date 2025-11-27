@@ -201,7 +201,7 @@ if __name__ == "__main__":
     
     print(f"\nTitle: {result['title']}")
     print(f"Mood: {result['detected_mood'].title()}")
-    print(f"Genre Alignment: {result['genre_alignment']}")
+    print(f"Genre Alignment:  {result['genre_alignment']}")
     
     print(f"\nScores:")
     for key, value in result['scores'].items():
