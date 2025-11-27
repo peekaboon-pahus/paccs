@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Film - PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f7fafc;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a365d, #2d3748);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo { font-size: 1.5em; font-weight: bold; }
+        .logo span { color: #48bb78; }
+        
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .main-content {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .form-container h1 {
+            color: #1a365d;
+            margin-bottom: 10px;
+        }
+        
+        .form-container > p {
+            color: #718096;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 600;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #48bb78;
+        }
+        
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn-submit:hover { transform: translateY(-2px); }
+        
+        .credits-note {
+            background: #ebf8ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            color: #2b6cb0;
+            font-size: 0.9em;
+        }
+        
+        .success-message {
+            background: #c6f6d5;
+            color: #276749;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🎬 <span>PACCS</span></div>
+        <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+    </div>
+    
+    <div class="main-content">
+        <div class="form-container">
+            <h1>Submit Your Film</h1>
+            <p>Enter your film details to get AI-powered analysis</p>
+            
+            <div class="credits-note">
+                💡 This will use 1 credit from your account. You have <strong id="creditsLeft">0</strong> credits remaining.
+            </div>
+            
+            <div class="error-message" id="errorMsg"></div>
+            <div class="success-message" id="successMsg">
+                ✅ Film submitted successfully! Redirecting to analysis...
+            </div>
+            
+            <form id="submitForm" onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label>Film Title *</label>
+                    <input type="text" id="title" placeholder="Enter your film title" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Runtime (minutes) *</label>
+                        <input type="number" id="duration" placeholder="e.g. 90" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Country *</label>
+                        <input type="text" id="country" placeholder="e.g. UK" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Genre *</label>
+                        <select id="genre" required>
+                            <option value="">Select genre</option>
+                            <option value="Drama">Drama</option>
+                            <option value="Comedy">Comedy</option>
+                            <option value="Documentary">Documentary</option>
+                            <option value="Horror">Horror</option>
+                            <option value="Thriller">Thriller</option>
+                            <option value="Sci-Fi">Sci-Fi</option>
+                            <option value="Romance">Romance</option>
+                            <option value="Action">Action</option>
+                            <option value="Animation">Animation</option>
+                            <option value="Experimental">Experimental</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Film Type *</label>
+                        <select id="filmType" required>
+                            <option value="">Select type</option>
+                            <option value="Short">Short Film</option>
+                            <option value="Feature">Feature Film</option>
+                            <option value="Documentary">Documentary</option>
+                            <option value="Music Video">Music Video</option>
+                            <option value="Web Series">Web Series</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Themes (comma separated)</label>
+                    <input type="text" id="themes" placeholder="e.g. family, identity, love">
+                </div>
+                
+                <div class="form-group">
+                    <label>Synopsis</label>
+                    <textarea id="synopsis" placeholder="Brief description of your film..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Budget Range</label>
+                        <select id="budget">
+                            <option value="micro">Micro (&lt;£10k)</option>
+                            <option value="low">Low (£10k-£50k)</option>
+                            <option value="medium">Medium (£50k-£500k)</option>
+                            <option value="high">High (£500k+)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Completion Status</label>
+                        <select id="status">
+                            <option value="completed">Completed</option>
+                            <option value="post-production">Post-Production</option>
+                            <option value="production">In Production</option>
+                            <option value="pre-production">Pre-Production</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-submit">Analyze My Film →</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        function loadCredits() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!user.email) {
+                window.location.href = '/login';
+                return;
+            }
+            document.getElementById('creditsLeft').textContent = user.credits || 0;
+        }
+        
+        async function handleSubmit(e) {
+            e.preventDefault();
+            
+            const filmData = {
+                title: document.getElementById('title').value,
+                duration: parseInt(document.getElementById('duration').value),
+                country: document.getElementById('country').value,
+                genre: document.getElementById('genre').value,
+                film_type: document.getElementById('filmType').value,
+                themes: document.getElementById('themes').value,
+                synopsis: document.getElementById('synopsis').value,
+                budget: document.getElementById('budget').value,
+                status: document.getElementById('status').value
+            };
+            
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+            
+            errorMsg.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/submit-film', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ film: filmData, email: user.email })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    successMsg.style.display = 'block';
+                    document.getElementById('submitForm').style.display = 'none';
+                    
+                    // Update local credits
+                    user.credits = data.credits_remaining;
+                    localStorage.setItem('user', JSON.stringify(user));
+                    
+                    setTimeout(() => {
+                        window.location.href = `/analyze?film_id=${data.film_id}`;
+                    }, 2000);
+                } else {
+                    errorMsg.textContent = data.error || 'Submission failed';
+                    errorMsg.style.display = 'block';
+                }
+            } catch (error) {
+                errorMsg.textContent = 'Connection error. Please try again.';
+                errorMsg.style.display = 'block';
+            }
+        }
+        
+        loadCredits();
+    </script>
+</body>
+</html>

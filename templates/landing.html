@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PACCS - AI Film Intelligence Platform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        
+        .hero {
+            background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 60px;
+        }
+        
+        .logo { font-size: 1.8em; font-weight: bold; }
+        .logo span { color: #48bb78; }
+        
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-links a { color: white; text-decoration: none; }
+        
+        .btn-login {
+            background: transparent;
+            border: 2px solid #48bb78;
+            color: #48bb78;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .btn-signup {
+            background: #48bb78;
+            border: none;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .hero-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .hero-text h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero-text h1 span { color: #48bb78; }
+        
+        .hero-text p {
+            font-size: 1.3em;
+            color: #a0aec0;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+        
+        .hero-buttons { display: flex; gap: 20px; justify-content: center; }
+        
+        .btn-primary {
+            background: #48bb78;
+            color: white;
+            padding: 18px 40px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        
+        .btn-primary:hover { transform: translateY(-3px); }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 16px 38px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            text-decoration: none;
+        }
+        
+        .stats-section {
+            background: #fff;
+            padding: 60px;
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+        }
+        
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 3em; font-weight: bold; color: #1a365d; }
+        .stat-label { color: #718096; font-size: 1.1em; }
+        
+        .features-section {
+            padding: 80px 60px;
+            background: #f7fafc;
+        }
+        
+        .features-section h2 {
+            text-align: center;
+            font-size: 2.5em;
+            color: #1a365d;
+            margin-bottom: 50px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .feature-icon { font-size: 2.5em; margin-bottom: 20px; }
+        .feature-card h3 { color: #1a365d; margin-bottom: 15px; font-size: 1.3em; }
+        .feature-card p { color: #718096; line-height: 1.6; }
+        
+        .cta-section {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            padding: 80px;
+            text-align: center;
+            color: white;
+        }
+        
+        .cta-section h2 { font-size: 2.5em; margin-bottom: 20px; }
+        .cta-section p { font-size: 1.2em; margin-bottom: 30px; opacity: 0.9; }
+        
+        .btn-white {
+            background: white;
+            color: #38a169;
+            padding: 18px 45px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        
+        footer {
+            background: #1a365d;
+            color: white;
+            padding: 40px 60px;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .features-grid { grid-template-columns: 1fr; }
+            .hero-text h1 { font-size: 2.2em; }
+            nav { padding: 20px; }
+            .stats-section { flex-direction: column; gap: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <nav>
+            <div class="logo">🎬 <span>PACCS</span></div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="/login" class="btn-login">Login</a>
+                <a href="/signup" class="btn-signup">Start Free</a>
+            </div>
+        </nav>
+        
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>AI-Powered <span>Film Intelligence</span></h1>
+                <p>Get instant analysis, festival matching, distribution recommendations, and revenue predictions for your film. Powered by AI agents trained on 4,700+ films.</p>
+                <div class="hero-buttons">
+                    <a href="/signup" class="btn-primary">Analyze Your Film Free →</a>
+                    <a href="#features" class="btn-secondary">See How It Works</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="stats-section">
+        <div class="stat-item">
+            <div class="stat-number">4,726</div>
+            <div class="stat-label">Films Analyzed</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">25+</div>
+            <div class="stat-label">Festival Partners</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">15+</div>
+            <div class="stat-label">Distributors</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">89%</div>
+            <div class="stat-label">Prediction Accuracy</div>
+        </div>
+    </div>
+    
+    <div class="features-section" id="features">
+        <h2>What PACCS Offers</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Instant Film Score</h3>
+                <p>Get a comprehensive 0-10 score based on quality, marketability, and audience appeal within seconds.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎪</div>
+                <h3>Festival Matching</h3>
+                <p>AI matches your film to 25+ festivals based on genre, themes, runtime, and historical selection data.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Success Predictions</h3>
+                <p>Probability scores for festival selection, distribution deals, awards, and viral potential.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>Revenue Estimates</h3>
+                <p>Data-driven market value predictions based on similar films' performance.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤝</div>
+                <h3>Distributor Matching</h3>
+                <p>Connect with 15+ distributors matched to your film's genre, market, and budget tier.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📄</div>
+                <h3>PDF Reports</h3>
+                <p>Download professional reports to share with investors, festivals, and distributors.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="cta-section">
+        <h2>Ready to Discover Your Film's Potential?</h2>
+        <p>Join thousands of filmmakers using PACCS to navigate the film industry</p>
+        <a href="/signup" class="btn-white">Get Started Free →</a>
+    </div>
+    
+    <footer>
+        <p>© 2025 PACCS - Peekaboon Agentic Creative Curation System | PAHUS Studios Limited</p>
+    </footer>
+</body>
+</html>
