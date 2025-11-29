@@ -1,8 +1,8 @@
 """
 PACCS - Peekaboon Agentic Creative Curation System
-Production Flask Application with AI Moderation
+Production Flask Application with AI Moderation & PDF Reports
 """
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, send_file
 import json
 import os
 import hashlib
@@ -10,7 +10,7 @@ import random
 import uuid
 import re
 from datetime import datetime
-from pdf_report import generate_film_report, generate_filmmaker_report
+from io import BytesIO
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'paccs-secret-key-change-in-production')
@@ -19,7 +19,6 @@ app.secret_key = os.environ.get('SECRET_KEY', 'paccs-secret-key-change-in-produc
 # AI MODERATION SYSTEM
 # ============================================
 
-# Offensive words list (basic - in production use a proper library)
 OFFENSIVE_WORDS = [
     'hate', 'kill', 'violence', 'terrorist', 'abuse', 'racist', 'nazi',
     'porn', 'xxx', 'nude', 'nsfw', 'sex', 'explicit',
@@ -34,24 +33,18 @@ SPAM_PATTERNS = [
 ]
 
 def moderate_content(profile_data):
-    """
-    AI-powered content moderation
-    Returns: { score: 0-100, status: str, flags: list, reasons: list }
-    """
+    """AI-powered content moderation"""
     flags = []
     reasons = []
-    score = 100  # Start with perfect score
+    score = 100
     
-    # Get text content
     bio = profile_data.get('bio', '').lower()
     full_name = f"{profile_data.get('firstName', '')} {profile_data.get('lastName', '')}".lower()
     designation = profile_data.get('designation', '').lower()
     company = profile_data.get('company', '').lower()
     all_text = f"{bio} {full_name} {designation} {company}"
     
-    # ============================================
-    # CHECK 1: Offensive Language
-    # ============================================
+    # Check offensive language
     offensive_found = []
     for word in OFFENSIVE_WORDS:
         if word in all_text:
@@ -59,12 +52,10 @@ def moderate_content(profile_data):
     
     if offensive_found:
         flags.append('offensive_language')
-        reasons.append(f"Potentially offensive content detected: {', '.join(offensive_found[:3])}")
+        reasons.append(f"Potentially offensive content detected")
         score -= 40
     
-    # ============================================
-    # CHECK 2: Spam Patterns
-    # ============================================
+    # Check spam patterns
     spam_found = False
     for pattern in SPAM_PATTERNS:
         if re.search(pattern, all_text, re.IGNORECASE):
@@ -73,126 +64,63 @@ def moderate_content(profile_data):
     
     if spam_found:
         flags.append('spam_detected')
-        reasons.append("Content appears to contain spam or promotional material")
+        reasons.append("Content appears to contain spam")
         score -= 30
     
-    # ============================================
-    # CHECK 3: Bio Quality
-    # ============================================
+    # Check bio quality
     bio_length = len(profile_data.get('bio', ''))
-    
     if bio_length < 20:
         flags.append('low_quality_bio')
-        reasons.append("Bio is too short (less than 20 characters)")
+        reasons.append("Bio is too short")
         score -= 15
     elif bio_length < 50:
         flags.append('short_bio')
         reasons.append("Bio could be more detailed")
         score -= 5
     
-    # ============================================
-    # CHECK 4: Suspicious Name Patterns
-    # ============================================
+    # Check name
     name = full_name.strip()
-    
-    # Check for numbers in name
     if re.search(r'\d', name):
         flags.append('suspicious_name')
         reasons.append("Name contains numbers")
         score -= 20
     
-    # Check for very short name
     if len(name) < 3:
         flags.append('invalid_name')
         reasons.append("Name is too short")
         score -= 25
     
-    # Check for all caps
-    original_name = f"{profile_data.get('firstName', '')} {profile_data.get('lastName', '')}"
-    if original_name.isupper() and len(original_name) > 3:
-        flags.append('all_caps_name')
-        reasons.append("Name is in all capitals")
-        score -= 10
-    
-    # ============================================
-    # CHECK 5: URL Validation
-    # ============================================
-    social_links = profile_data.get('socialLinks', {})
-    film_links = profile_data.get('filmLinks', [])
-    all_links = list(social_links.values()) + film_links
-    
-    suspicious_domains = ['bit.ly', 'tinyurl', 't.co', 'goo.gl', 'shorturl']
-    
-    for link in all_links:
-        if link:
-            link_lower = link.lower()
-            # Check for suspicious shortened URLs
-            for domain in suspicious_domains:
-                if domain in link_lower:
-                    flags.append('suspicious_links')
-                    reasons.append("Contains shortened URLs which may be suspicious")
-                    score -= 15
-                    break
-            
-            # Check for non-http links
-            if link and not link.startswith(('http://', 'https://')):
-                if not 'invalid_url_format' in flags:
-                    flags.append('invalid_url_format')
-                    reasons.append("Some URLs have invalid format")
-                    score -= 5
-    
-    # ============================================
-    # CHECK 6: Duplicate/Plagiarism Check
-    # ============================================
-    # In production, compare bio against database of existing bios
-    common_placeholder_bios = [
-        'test', 'testing', 'asdf', 'lorem ipsum', 'sample bio',
-        'bio here', 'about me', 'description', 'filmmaker bio'
-    ]
-    
-    for placeholder in common_placeholder_bios:
+    # Check placeholder content
+    common_placeholders = ['test', 'testing', 'asdf', 'lorem ipsum', 'sample bio']
+    for placeholder in common_placeholders:
         if bio.strip() == placeholder or bio.strip().startswith(placeholder):
             flags.append('placeholder_content')
-            reasons.append("Bio appears to be placeholder/test content")
+            reasons.append("Bio appears to be placeholder content")
             score -= 30
             break
     
-    # ============================================
-    # CHECK 7: Professional Quality Score
-    # ============================================
+    # Professional score bonus
     professional_score = 0
-    
-    # Has social links
+    social_links = profile_data.get('socialLinks', {})
     valid_social_links = sum(1 for v in social_links.values() if v)
     if valid_social_links >= 2:
         professional_score += 10
     elif valid_social_links >= 1:
         professional_score += 5
     
-    # Has film links
-    valid_film_links = len([l for l in film_links if l])
-    if valid_film_links >= 1:
+    film_links = profile_data.get('filmLinks', [])
+    if len([l for l in film_links if l]) >= 1:
         professional_score += 10
     
-    # Has designation
     if profile_data.get('designation'):
         professional_score += 5
-    
-    # Has company
     if profile_data.get('company'):
         professional_score += 5
-    
-    # Good bio length
     if bio_length >= 100:
         professional_score += 10
     
-    # Add professional score bonus
     score = min(100, score + professional_score)
-    
-    # ============================================
-    # DETERMINE STATUS
-    # ============================================
-    score = max(0, min(100, score))  # Clamp between 0-100
+    score = max(0, min(100, score))
     
     if score >= 80:
         status = 'auto_approved'
@@ -205,10 +133,203 @@ def moderate_content(profile_data):
         'score': score,
         'status': status,
         'flags': flags,
-        'reasons': reasons,
-        'checks_passed': 7 - len(flags),
-        'total_checks': 7
+        'reasons': reasons
     }
+
+# ============================================
+# PDF REPORT GENERATOR
+# ============================================
+
+def generate_film_report_pdf(film_data, analysis_data):
+    """Generate PDF report for film analysis"""
+    try:
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.units import cm
+        from reportlab.lib.colors import HexColor
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+        from reportlab.lib.enums import TA_CENTER
+        
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=1.5*cm, leftMargin=1.5*cm, topMargin=1.5*cm, bottomMargin=1.5*cm)
+        
+        styles = getSampleStyleSheet()
+        PURPLE = HexColor('#a855f7')
+        DARK = HexColor('#1a1a2e')
+        GRAY = HexColor('#6b7280')
+        WHITE = HexColor('#ffffff')
+        
+        title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=28, textColor=PURPLE, spaceAfter=20, alignment=TA_CENTER)
+        subtitle_style = ParagraphStyle('Subtitle', parent=styles['Normal'], fontSize=14, textColor=GRAY, spaceAfter=30, alignment=TA_CENTER)
+        heading_style = ParagraphStyle('Heading', parent=styles['Heading2'], fontSize=16, textColor=PURPLE, spaceBefore=25, spaceAfter=15)
+        body_style = ParagraphStyle('Body', parent=styles['Normal'], fontSize=11, textColor=DARK, spaceAfter=10)
+        score_style = ParagraphStyle('Score', parent=styles['Normal'], fontSize=48, textColor=PURPLE, alignment=TA_CENTER)
+        
+        story = []
+        
+        story.append(Paragraph("PACCS", title_style))
+        story.append(Paragraph("AI Film Intelligence Report", subtitle_style))
+        story.append(Spacer(1, 20))
+        
+        film_title = film_data.get('title', 'Untitled Film')
+        story.append(Paragraph(f"<b>{film_title}</b>", ParagraphStyle('FilmTitle', parent=styles['Heading1'], fontSize=24, textColor=DARK, alignment=TA_CENTER, spaceAfter=10)))
+        
+        genre = film_data.get('genre', 'Unknown')
+        country = film_data.get('country', 'Unknown')
+        story.append(Paragraph(f"{genre} | {country}", ParagraphStyle('Meta', parent=body_style, alignment=TA_CENTER, textColor=GRAY)))
+        story.append(Spacer(1, 30))
+        
+        story.append(Paragraph("OVERALL SCORE", heading_style))
+        score = analysis_data.get('score', 0)
+        story.append(Paragraph(f"{score}/10", score_style))
+        
+        pathway = analysis_data.get('pathway', 'FESTIVAL')
+        story.append(Paragraph(f"Recommended Pathway: {pathway}", ParagraphStyle('Pathway', parent=body_style, alignment=TA_CENTER)))
+        story.append(Spacer(1, 20))
+        
+        story.append(Paragraph("SUCCESS PREDICTIONS", heading_style))
+        predictions = analysis_data.get('predictions', {})
+        pred_data = [
+            ['Metric', 'Probability'],
+            ['Festival Selection', f"{predictions.get('festival_selection', 0)}%"],
+            ['Distribution Deal', f"{predictions.get('distribution_deal', 0)}%"],
+            ['Award Nomination', f"{predictions.get('award_nomination', 0)}%"],
+            ['Viral Potential', f"{predictions.get('viral_potential', 0)}%"],
+        ]
+        
+        pred_table = Table(pred_data, colWidths=[10*cm, 5*cm])
+        pred_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), PURPLE),
+            ('TEXTCOLOR', (0, 0), (-1, 0), WHITE),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('TOPPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), HexColor('#f8f9fa')),
+            ('GRID', (0, 0), (-1, -1), 1, HexColor('#e5e7eb')),
+        ]))
+        story.append(pred_table)
+        story.append(Spacer(1, 20))
+        
+        story.append(Paragraph("FESTIVAL RECOMMENDATIONS", heading_style))
+        festivals = analysis_data.get('festivals', [])
+        if festivals:
+            fest_data = [['Festival', 'Match Score']]
+            for fest in festivals[:5]:
+                fest_data.append([fest.get('name', ''), f"{fest.get('score', 0)}%"])
+            
+            fest_table = Table(fest_data, colWidths=[10*cm, 5*cm])
+            fest_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), PURPLE),
+                ('TEXTCOLOR', (0, 0), (-1, 0), WHITE),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('ALIGN', (0, 1), (0, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BACKGROUND', (0, 1), (-1, -1), HexColor('#f8f9fa')),
+                ('GRID', (0, 0), (-1, -1), 1, HexColor('#e5e7eb')),
+            ]))
+            story.append(fest_table)
+        story.append(Spacer(1, 20))
+        
+        story.append(Paragraph("DISTRIBUTOR MATCHES", heading_style))
+        distributors = analysis_data.get('distributors', [])
+        if distributors:
+            dist_data = [['Distributor', 'Match Score']]
+            for dist in distributors[:5]:
+                dist_data.append([dist.get('name', ''), f"{dist.get('score', 0)}%"])
+            
+            dist_table = Table(dist_data, colWidths=[10*cm, 5*cm])
+            dist_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), HexColor('#7c3aed')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), WHITE),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('ALIGN', (0, 1), (0, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BACKGROUND', (0, 1), (-1, -1), HexColor('#f8f9fa')),
+                ('GRID', (0, 0), (-1, -1), 1, HexColor('#e5e7eb')),
+            ]))
+            story.append(dist_table)
+        story.append(Spacer(1, 30))
+        
+        generated_date = datetime.now().strftime("%B %d, %Y")
+        story.append(Paragraph(f"Report generated on {generated_date}", ParagraphStyle('Footer', parent=body_style, alignment=TA_CENTER, textColor=GRAY, fontSize=9)))
+        story.append(Paragraph("Powered by PACCS | paccs.peekaboon.com", ParagraphStyle('Footer2', parent=body_style, alignment=TA_CENTER, textColor=PURPLE, fontSize=10)))
+        
+        doc.build(story)
+        buffer.seek(0)
+        return buffer
+    except ImportError:
+        return None
+
+def generate_filmmaker_report_pdf(profile_data):
+    """Generate PDF profile for a filmmaker"""
+    try:
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.units import cm
+        from reportlab.lib.colors import HexColor
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+        from reportlab.lib.enums import TA_CENTER
+        
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=1.5*cm, leftMargin=1.5*cm, topMargin=1.5*cm, bottomMargin=1.5*cm)
+        
+        styles = getSampleStyleSheet()
+        PURPLE = HexColor('#a855f7')
+        DARK = HexColor('#1a1a2e')
+        GRAY = HexColor('#6b7280')
+        
+        title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=32, textColor=DARK, spaceAfter=10, alignment=TA_CENTER)
+        subtitle_style = ParagraphStyle('Subtitle', parent=styles['Normal'], fontSize=16, textColor=PURPLE, spaceAfter=5, alignment=TA_CENTER)
+        heading_style = ParagraphStyle('Heading', parent=styles['Heading2'], fontSize=14, textColor=PURPLE, spaceBefore=20, spaceAfter=10)
+        body_style = ParagraphStyle('Body', parent=styles['Normal'], fontSize=11, textColor=DARK, spaceAfter=10, leading=16)
+        
+        story = []
+        
+        story.append(Paragraph(profile_data.get('fullName', 'Filmmaker'), title_style))
+        story.append(Paragraph(profile_data.get('designation', ''), subtitle_style))
+        
+        if profile_data.get('company'):
+            story.append(Paragraph(profile_data.get('company'), ParagraphStyle('Company', parent=body_style, alignment=TA_CENTER, textColor=GRAY)))
+        
+        location_parts = []
+        if profile_data.get('city'):
+            location_parts.append(profile_data.get('city'))
+        if profile_data.get('country'):
+            location_parts.append(profile_data.get('country'))
+        if location_parts:
+            story.append(Paragraph(' | '.join(location_parts), ParagraphStyle('Location', parent=body_style, alignment=TA_CENTER, textColor=GRAY)))
+        
+        story.append(Spacer(1, 30))
+        
+        if profile_data.get('bio'):
+            story.append(Paragraph("ABOUT", heading_style))
+            story.append(Paragraph(profile_data.get('bio'), body_style))
+        
+        film_links = profile_data.get('filmLinks', [])
+        if film_links:
+            story.append(Paragraph("FILMS", heading_style))
+            for i, link in enumerate(film_links):
+                if link:
+                    story.append(Paragraph(f"Film {i+1}: {link}", body_style))
+        
+        social_links = profile_data.get('socialLinks', {})
+        active_links = {k: v for k, v in social_links.items() if v}
+        if active_links:
+            story.append(Paragraph("CONNECT", heading_style))
+            for platform, url in active_links.items():
+                story.append(Paragraph(f"{platform.title()}: {url}", body_style))
+        
+        story.append(Spacer(1, 40))
+        story.append(Paragraph("Peekaboo Club Member", ParagraphStyle('Footer', parent=body_style, alignment=TA_CENTER, textColor=PURPLE, fontSize=12)))
+        story.append(Paragraph("paccs.peekaboon.com", ParagraphStyle('Footer2', parent=body_style, alignment=TA_CENTER, textColor=GRAY, fontSize=10)))
+        
+        doc.build(story)
+        buffer.seek(0)
+        return buffer
+    except ImportError:
+        return None
 
 # ============================================
 # DATA LOADING
@@ -218,8 +339,7 @@ def load_films():
     try:
         with open('films_database.json', 'r') as f:
             return json.load(f)
-    except Exception as e:
-        print(f"Error loading films: {e}")
+    except:
         return []
 
 def load_users():
@@ -315,7 +435,6 @@ def get_films():
 @app.route('/api/analyze', methods=['POST'])
 def analyze_film():
     data = request.json
-    film = data.get('film', {})
     
     score = round(random.uniform(5.5, 8.5), 1)
     pathway = 'THEATRICAL' if score > 6.5 else 'FESTIVAL'
@@ -348,7 +467,7 @@ def analyze_film():
     return jsonify(result)
 
 # ============================================
-# API ROUTES - AUTHENTICATION & PROFILES
+# API ROUTES - AUTHENTICATION
 # ============================================
 
 @app.route('/api/signup', methods=['POST'])
@@ -374,7 +493,6 @@ def api_signup():
     if not first_name or not last_name:
         return jsonify({'success': False, 'error': 'Name is required'})
     
-    # Run AI moderation
     moderation = moderate_content(data)
     
     user_id = f"USER_{len(users) + 1:05d}"
@@ -411,7 +529,6 @@ def api_signup():
         'socialLinks': data.get('socialLinks', {}),
         'filmLinks': data.get('filmLinks', []),
         'films': [],
-        # AI Moderation results
         'status': moderation['status'],
         'moderation_score': moderation['score'],
         'moderation_flags': moderation['flags'],
@@ -511,7 +628,7 @@ def get_user_credits():
     return jsonify({'credits': 0, 'plan': 'free'})
 
 # ============================================
-# API ROUTES - FILMMAKER PROFILES
+# API ROUTES - PROFILES
 # ============================================
 
 @app.route('/api/profile/<profile_id>')
@@ -521,7 +638,6 @@ def get_profile(profile_id):
     if profile_id in profiles:
         profile = profiles[profile_id]
         
-        # Only show approved or auto_approved profiles publicly
         if profile.get('status') not in ['approved', 'auto_approved'] and not profile.get('featured'):
             return jsonify({'success': False, 'error': 'Profile not available'}), 404
         
@@ -570,7 +686,6 @@ def get_filmmakers():
     
     filmmakers = []
     for profile_id, profile in profiles.items():
-        # Only show approved, auto_approved, or featured profiles
         if profile.get('status') in ['approved', 'auto_approved'] or profile.get('featured'):
             filmmakers.append({
                 'id': profile['id'],
@@ -695,12 +810,10 @@ def admin_feature_profile(profile_id):
 # API ROUTES - PDF REPORTS
 # ============================================
 
-@app.route('/api/report/<film_id>/pdf')
-def download_film_report(film_id):
+@app.route('/api/report/pdf')
+def download_film_report():
     """Generate and download PDF report for a film analysis"""
-    from flask import send_file
     
-    # Get film data (mock for now - in production, fetch from database)
     film_data = {
         'title': request.args.get('title', 'Film Analysis'),
         'genre': request.args.get('genre', 'Drama'),
@@ -708,7 +821,6 @@ def download_film_report(film_id):
         'runtime': request.args.get('runtime', 'N/A')
     }
     
-    # Get analysis data from query params or generate mock
     analysis_data = {
         'score': float(request.args.get('score', 7.5)),
         'pathway': request.args.get('pathway', 'FESTIVAL'),
@@ -734,10 +846,11 @@ def download_film_report(film_id):
         ]
     }
     
-    # Generate PDF
-    pdf_buffer = generate_film_report(film_data, analysis_data)
+    pdf_buffer = generate_film_report_pdf(film_data, analysis_data)
     
-    # Create filename
+    if pdf_buffer is None:
+        return jsonify({'error': 'PDF generation not available. Install reportlab.'}), 500
+    
     safe_title = film_data['title'].replace(' ', '_')[:30]
     filename = f"PACCS_Report_{safe_title}.pdf"
     
@@ -749,9 +862,8 @@ def download_film_report(film_id):
     )
 
 @app.route('/api/filmmaker/<profile_id>/pdf')
-def download_filmmaker_report(profile_id):
+def download_filmmaker_pdf(profile_id):
     """Generate and download PDF profile for a filmmaker"""
-    from flask import send_file
     
     profiles = load_profiles()
     
@@ -760,10 +872,11 @@ def download_filmmaker_report(profile_id):
     
     profile = profiles[profile_id]
     
-    # Generate PDF
-    pdf_buffer = generate_filmmaker_report(profile)
+    pdf_buffer = generate_filmmaker_report_pdf(profile)
     
-    # Create filename
+    if pdf_buffer is None:
+        return jsonify({'error': 'PDF generation not available. Install reportlab.'}), 500
+    
     safe_name = profile.get('fullName', 'Filmmaker').replace(' ', '_')[:30]
     filename = f"PACCS_Profile_{safe_name}.pdf"
     
@@ -773,6 +886,7 @@ def download_filmmaker_report(profile_id):
         as_attachment=True,
         download_name=filename
     )
+
 # ============================================
 # API ROUTES - MUSIC & CONTENT
 # ============================================
@@ -832,7 +946,7 @@ if __name__ == '__main__':
     
     print("\n" + "="*60)
     print("PACCS - AI Film Intelligence Platform")
-    print("With AI-Powered Content Moderation")
+    print("With AI Moderation & PDF Reports")
     print("="*60)
     print(f"\nLoaded {len(films_data)} films")
     print(f"Running on http://localhost:{port}")
