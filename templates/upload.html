@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Film - PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5em; font-weight: bold; color: #fff; text-decoration: none; }
+        .logo span { color: #a855f7; }
+        .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; padding: 8px 16px; margin-left: 10px; }
+        .hero { background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%); padding: 50px 40px; text-align: center; }
+        .hero h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .hero h1 span { color: #a855f7; }
+        .hero p { color: rgba(255,255,255,0.7); }
+        .main-content { max-width: 800px; margin: 0 auto; padding: 40px; }
+        .benefits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+        .benefit { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 20px; text-align: center; }
+        .benefit .icon { font-size: 2em; margin-bottom: 10px; }
+        .benefit h3 { font-size: 1em; margin-bottom: 5px; }
+        .benefit p { color: rgba(255,255,255,0.5); font-size: 0.85em; }
+        .form-card { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 40px; }
+        .form-section { margin-bottom: 30px; }
+        .form-section h3 { color: #a855f7; margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .form-group label .req { color: #ef4444; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 15px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; font-size: 1em; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #a855f7; }
+        .form-group textarea { min-height: 100px; }
+        .form-group select option { background: #1a1a2e; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .price-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .price-opt { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; }
+        .price-opt:hover { border-color: rgba(168,85,247,0.5); }
+        .price-opt.selected { border-color: #a855f7; background: rgba(168,85,247,0.2); }
+        .price-opt .amt { font-size: 1.5em; font-weight: bold; color: #a855f7; }
+        .price-opt .lbl { font-size: 0.8em; color: rgba(255,255,255,0.5); }
+        .earnings { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 10px; padding: 20px; margin-top: 15px; }
+        .earnings h4 { color: #22c55e; margin-bottom: 10px; }
+        .earnings .row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .earnings .total { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: 10px; }
+        .earnings .total .val { color: #22c55e; font-size: 1.2em; font-weight: bold; }
+        .terms { display: flex; gap: 15px; margin: 25px 0; }
+        .terms input { width: 20px; height: 20px; }
+        .terms label { color: rgba(255,255,255,0.7); font-size: 0.9em; line-height: 1.5; }
+        .terms a { color: #a855f7; }
+        .submit-btn { display: block; width: 100%; background: linear-gradient(135deg, #a855f7, #7c3aed); color: white; padding: 18px; border-radius: 30px; border: none; font-size: 1.2em; font-weight: 600; cursor: pointer; }
+        .submit-btn:hover { box-shadow: 0 10px 30px rgba(168,85,247,0.4); }
+        .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .login-prompt { text-align: center; padding: 60px; }
+        .login-prompt .icon { font-size: 4em; margin-bottom: 20px; }
+        .login-prompt h2 { margin-bottom: 15px; }
+        .login-prompt p { color: rgba(255,255,255,0.6); margin-bottom: 25px; }
+        .login-prompt .btn { display: inline-block; background: linear-gradient(135deg, #a855f7, #7c3aed); color: white; padding: 15px 40px; border-radius: 25px; text-decoration: none; font-weight: 600; }
+        @media (max-width: 600px) { .benefits { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } .price-options { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="/" class="logo">🎬 <span>PACCS</span></a>
+        <nav class="nav-links"><a href="/watch">Browse Films</a><a href="/dashboard">Dashboard</a></nav>
+    </header>
+    
+    <section class="hero">
+        <h1>Upload Your <span>Film</span></h1>
+        <p>Share your work and earn 70% of every rental</p>
+    </section>
+    
+    <main class="main-content" id="main"></main>
+    
+    <script>
+        const user = JSON.parse(localStorage.getItem('paccs_user') || 'null');
+        let price = 5;
+        
+        function init() {
+            if (!user) {
+                document.getElementById('main').innerHTML = `<div class="login-prompt"><div class="icon">🔐</div><h2>Login Required</h2><p>You need to be logged in to upload films.</p><a href="/login?redirect=/upload" class="btn">Login</a><p style="margin-top:20px;color:rgba(255,255,255,0.5)">No account? <a href="/signup" style="color:#a855f7">Sign up free</a></p></div>`;
+            } else { showForm(); }
+        }
+        
+        function showForm() {
+            document.getElementById('main').innerHTML = `
+                <div class="benefits">
+                    <div class="benefit"><div class="icon">💰</div><h3>70% Revenue</h3><p>Keep most of your earnings</p></div>
+                    <div class="benefit"><div class="icon">🌍</div><h3>Global Reach</h3><p>Worldwide audience</p></div>
+                    <div class="benefit"><div class="icon">📊</div><h3>Analytics</h3><p>Track your views</p></div>
+                </div>
+                <form class="form-card" onsubmit="submit(event)">
+                    <div class="form-section">
+                        <h3>📝 Film Details</h3>
+                        <div class="form-group"><label>Title <span class="req">*</span></label><input type="text" name="title" required placeholder="Your film's title"></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Genre <span class="req">*</span></label><select name="genre" required><option value="">Select</option><option>Drama</option><option>Documentary</option><option>Comedy</option><option>Thriller</option><option>Horror</option><option>Sci-Fi</option><option>Animation</option><option>Experimental</option></select></div>
+                            <div class="form-group"><label>Runtime</label><input type="text" name="duration" placeholder="e.g., 90 min"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Year</label><input type="number" name="year" value="2024"></div>
+                            <div class="form-group"><label>Country</label><input type="text" name="country" placeholder="Country"></div>
+                        </div>
+                        <div class="form-group"><label>Description <span class="req">*</span></label><textarea name="description" required placeholder="Tell viewers about your film..."></textarea></div>
+                    </div>
+                    <div class="form-section">
+                        <h3>🎬 Video & Thumbnail</h3>
+                        <div class="form-group"><label>Video URL (Vimeo/YouTube)</label><input type="url" name="video_url" placeholder="https://vimeo.com/..."></div>
+                        <div class="form-group"><label>Thumbnail URL</label><input type="url" name="thumbnail" placeholder="https://... (poster image)"></div>
+                    </div>
+                    <div class="form-section">
+                        <h3>💰 Set Your Price</h3>
+                        <p style="color:rgba(255,255,255,0.6);margin-bottom:15px;">48-hour rental price</p>
+                        <div class="price-options">
+                            <div class="price-opt" onclick="setPrice(0,this)"><div class="amt">FREE</div><div class="lbl">Build audience</div></div>
+                            <div class="price-opt" onclick="setPrice(3,this)"><div class="amt">£3</div><div class="lbl">Short films</div></div>
+                            <div class="price-opt selected" onclick="setPrice(5,this)"><div class="amt">£5</div><div class="lbl">Recommended</div></div>
+                            <div class="price-opt" onclick="setPrice(10,this)"><div class="amt">£10</div><div class="lbl">Premium</div></div>
+                        </div>
+                        <div class="earnings"><h4>💵 Your Earnings Per Rental</h4><div class="row"><span>Price:</span><span id="ep">£5.00</span></div><div class="row"><span>Platform (30%):</span><span id="ef">-£1.50</span></div><div class="row total"><span>You receive:</span><span class="val" id="ey">£3.50</span></div></div>
+                    </div>
+                    <div class="terms"><input type="checkbox" id="terms" required><label for="terms">I have rights to distribute this film and agree to PACCS's terms.</label></div>
+                    <button type="submit" class="submit-btn" id="btn">📤 Submit Film for Review</button>
+                    <p style="text-align:center;margin-top:15px;color:rgba(255,255,255,0.5);font-size:0.9em;">Films are reviewed within 24-48 hours</p>
+                </form>`;
+            updateEarnings();
+        }
+        
+        function setPrice(p, el) {
+            price = p;
+            document.querySelectorAll('.price-opt').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+            updateEarnings();
+        }
+        
+        function updateEarnings() {
+            document.getElementById('ep').textContent = price === 0 ? 'FREE' : '£' + price.toFixed(2);
+            document.getElementById('ef').textContent = price === 0 ? '£0.00' : '-£' + (price * 0.3).toFixed(2);
+            document.getElementById('ey').textContent = price === 0 ? '£0.00' : '£' + (price * 0.7).toFixed(2);
+        }
+        
+        async function submit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('btn');
+            btn.disabled = true; btn.textContent = 'Submitting...';
+            
+            const data = {
+                title: form.title.value, genre: form.genre.value, duration: form.duration.value,
+                year: form.year.value, country: form.country.value, description: form.description.value,
+                video_url: form.video_url.value, thumbnail: form.thumbnail.value, price: price,
+                filmmaker: user.name, filmmaker_id: user.profile_id, filmmaker_email: user.email
+            };
+            
+            try {
+                const res = await fetch('/api/streaming/upload', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'X-User-Email': user.email },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (result.success) { alert('🎉 Film submitted! We will review it within 24-48 hours.'); window.location = '/dashboard'; }
+                else { alert(result.error || 'Error'); btn.disabled = false; btn.textContent = '📤 Submit Film for Review'; }
+            } catch(err) { alert('Error'); btn.disabled = false; btn.textContent = '📤 Submit Film for Review'; }
+        }
+        
+        init();
+    </script>
+</body>
+</html>

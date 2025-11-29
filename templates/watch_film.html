@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch - PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5em; font-weight: bold; color: #fff; text-decoration: none; }
+        .logo span { color: #a855f7; }
+        .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; padding: 8px 16px; margin-left: 10px; }
+        .video-section { background: #000; min-height: 400px; display: flex; align-items: center; justify-content: center; }
+        .video-player { width: 100%; max-height: 70vh; }
+        .paywall { background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(124,58,237,0.1)); border: 2px solid rgba(168,85,247,0.5); border-radius: 20px; padding: 50px; text-align: center; max-width: 500px; }
+        .paywall h3 { font-size: 1.5em; margin-bottom: 15px; }
+        .paywall .price { font-size: 3em; color: #a855f7; font-weight: bold; margin: 20px 0; }
+        .paywall .price small { font-size: 0.4em; color: rgba(255,255,255,0.6); }
+        .paywall ul { list-style: none; text-align: left; margin: 20px 0; }
+        .paywall ul li { padding: 8px 0; }
+        .paywall ul li::before { content: '✓'; color: #22c55e; margin-right: 10px; }
+        .btn-rent { display: block; background: linear-gradient(135deg, #a855f7, #7c3aed); color: white; padding: 18px; border-radius: 30px; border: none; font-size: 1.1em; font-weight: 600; cursor: pointer; width: 100%; }
+        .btn-rent:hover { box-shadow: 0 10px 30px rgba(168,85,247,0.4); }
+        .btn-rent:disabled { opacity: 0.7; cursor: not-allowed; }
+        .film-details { max-width: 1000px; margin: 0 auto; padding: 40px; display: grid; grid-template-columns: 2fr 1fr; gap: 40px; }
+        .film-main h1 { font-size: 2.2em; margin-bottom: 15px; }
+        .film-meta { color: rgba(255,255,255,0.6); margin-bottom: 20px; }
+        .film-desc { line-height: 1.8; color: rgba(255,255,255,0.85); margin-bottom: 20px; }
+        .film-score { display: inline-block; background: rgba(168,85,247,0.2); color: #a855f7; padding: 8px 15px; border-radius: 15px; font-weight: 600; }
+        .filmmaker-card { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 25px; text-align: center; }
+        .filmmaker-card .avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #a855f7, #7c3aed); display: flex; align-items: center; justify-content: center; font-size: 2em; margin: 0 auto 15px; }
+        .filmmaker-card h3 { margin-bottom: 5px; }
+        .filmmaker-card .role { color: #a855f7; margin-bottom: 15px; }
+        .filmmaker-card .btn-profile { display: inline-block; background: rgba(168,85,247,0.2); color: #a855f7; padding: 10px 20px; border-radius: 20px; text-decoration: none; }
+        .access-box { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 15px; padding: 20px; margin-top: 20px; text-align: center; }
+        .access-box h4 { color: #22c55e; }
+        .loading { text-align: center; padding: 100px; }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.2); border-top-color: #a855f7; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 800px) { .film-details { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="/" class="logo">🎬 <span>PACCS</span></a>
+        <nav class="nav-links">
+            <a href="/watch">Browse Films</a>
+            <a href="/dashboard">Dashboard</a>
+        </nav>
+    </header>
+    
+    <div id="content"><div class="loading"><div class="spinner"></div><p>Loading film...</p></div></div>
+    
+    <script>
+        const filmId = window.location.pathname.split('/').pop();
+        const user = JSON.parse(localStorage.getItem('paccs_user') || 'null');
+        let film = null;
+        
+        async function load() {
+            try {
+                const res = await fetch('/api/streaming/film/' + filmId);
+                const data = await res.json();
+                if (data.success) { film = data.film; checkAccess(); }
+                else showError();
+            } catch(e) { showError(); }
+        }
+        
+        async function checkAccess() {
+            let hasAccess = film.price === 0;
+            if (user && !hasAccess) {
+                try {
+                    const res = await fetch('/api/streaming/check-access/' + filmId, { headers: { 'X-User-Email': user.email } });
+                    const data = await res.json();
+                    hasAccess = data.hasAccess;
+                } catch(e) {}
+            }
+            render(hasAccess);
+        }
+        
+        function render(hasAccess) {
+            let video = '';
+            if (hasAccess) {
+                video = film.video_url ? 
+                    `<div class="video-section"><iframe class="video-player" src="${film.video_url.replace('vimeo.com', 'player.vimeo.com/video').replace('youtube.com/watch?v=', 'youtube.com/embed/')}" frameborder="0" allowfullscreen style="width:100%;height:500px;"></iframe></div>` :
+                    `<div class="video-section"><div style="text-align:center;padding:100px;"><p style="font-size:3em;">🎬</p><h2>Video Coming Soon</h2></div></div>`;
+            } else {
+                video = `<div class="video-section">
+                    <div class="paywall">
+                        <h3>🔒 Rent This Film</h3>
+                        <div class="price">£${film.price}<small> / 48hr</small></div>
+                        <ul><li>Stream instantly in HD</li><li>48 hours unlimited viewing</li><li>70% goes to filmmaker</li></ul>
+                        <button class="btn-rent" onclick="rent()">▶ Rent Now • £${film.price}</button>
+                        ${!user ? '<p style="margin-top:15px;font-size:0.9em;color:rgba(255,255,255,0.5)"><a href="/login" style="color:#a855f7">Login</a> to rent</p>' : ''}
+                    </div>
+                </div>`;
+            }
+            
+            document.getElementById('content').innerHTML = video + `
+                <div class="film-details">
+                    <div class="film-main">
+                        <h1>${film.title}</h1>
+                        <div class="film-meta">🎬 ${film.genre || 'Film'} • ⏱ ${film.duration || '90 min'} • 📅 ${film.year || '2024'} • 🌍 ${film.country || ''}</div>
+                        ${film.score ? `<span class="film-score">⭐ PACCS Score: ${film.score}/10</span>` : ''}
+                        <p class="film-desc">${film.description || 'An independent film.'}</p>
+                        ${hasAccess ? '<div class="access-box"><h4>✓ You Have Access</h4><p>Enjoy! Your rental is valid for 48 hours.</p></div>' : ''}
+                    </div>
+                    <div>
+                        <div class="filmmaker-card">
+                            <div class="avatar">${film.filmmaker ? film.filmmaker[0] : '🎬'}</div>
+                            <h3>${film.filmmaker || 'Filmmaker'}</h3>
+                            <p class="role">Director</p>
+                            ${film.filmmaker_id ? `<a href="/filmmaker/${film.filmmaker_id}" class="btn-profile">View Profile</a>` : ''}
+                        </div>
+                    </div>
+                </div>`;
+            document.title = film.title + ' - PACCS';
+        }
+        
+        async function rent() {
+            if (!user) { window.location = '/login?redirect=/watch/' + filmId; return; }
+            const btn = document.querySelector('.btn-rent');
+            btn.disabled = true; btn.textContent = 'Processing...';
+            try {
+                const res = await fetch('/api/streaming/rent', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ film_id: filmId, email: user.email })
+                });
+                const data = await res.json();
+                if (data.url) window.location = data.url;
+                else { alert(data.error || 'Error'); btn.disabled = false; btn.textContent = '▶ Rent Now • £' + film.price; }
+            } catch(e) { alert('Error'); btn.disabled = false; }
+        }
+        
+        function showError() {
+            document.getElementById('content').innerHTML = '<div style="text-align:center;padding:100px;"><h2>Film Not Found</h2><a href="/watch" style="color:#a855f7">Browse Films</a></div>';
+        }
+        
+        load();
+    </script>
+</body>
+</html>

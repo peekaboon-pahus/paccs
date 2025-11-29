@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rental Successful - PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; display: flex; flex-direction: column; }
+        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 15px 40px; }
+        .logo { font-size: 1.5em; font-weight: bold; color: #fff; text-decoration: none; }
+        .logo span { color: #a855f7; }
+        .main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
+        .card { background: rgba(255,255,255,0.05); border-radius: 30px; padding: 60px; text-align: center; max-width: 500px; }
+        .icon { width: 100px; height: 100px; background: linear-gradient(135deg, #22c55e, #16a34a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3em; margin: 0 auto 30px; animation: pop 0.5s ease; }
+        @keyframes pop { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .card h1 { color: #22c55e; font-size: 2em; margin-bottom: 15px; }
+        .card p { color: rgba(255,255,255,0.7); margin-bottom: 30px; line-height: 1.6; }
+        .info { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 15px; padding: 25px; margin-bottom: 30px; text-align: left; }
+        .info .row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .info .row:last-child { margin-bottom: 0; }
+        .info .label { color: rgba(255,255,255,0.6); }
+        .info .value { font-weight: 600; }
+        .btn { display: inline-block; background: linear-gradient(135deg, #a855f7, #7c3aed); color: white; padding: 18px 50px; border-radius: 30px; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+        .btn:hover { box-shadow: 0 10px 30px rgba(168,85,247,0.4); }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.2); border-top-color: #a855f7; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <header class="header"><a href="/" class="logo">🎬 <span>PACCS</span></a></header>
+    <main class="main"><div class="card" id="card"><div class="spinner"></div><p>Verifying rental...</p></div></main>
+    
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const sessionId = params.get('session_id');
+        const filmId = params.get('film_id');
+        const user = JSON.parse(localStorage.getItem('paccs_user') || 'null');
+        
+        async function verify() {
+            if (!sessionId || !filmId) { showError(); return; }
+            
+            try {
+                const res = await fetch('/api/streaming/verify-rental', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId, film_id: filmId })
+                });
+                const data = await res.json();
+                
+                if (data.success) { showSuccess(); }
+                else { showError(); }
+            } catch (e) { showError(); }
+        }
+        
+        function showSuccess() {
+            document.getElementById('card').innerHTML = `
+                <div class="icon">✓</div>
+                <h1>Rental Successful!</h1>
+                <p>You now have 48-hour access to watch this film. Enjoy!</p>
+                <div class="info">
+                    <div class="row"><span class="label">Access Period</span><span class="value">48 Hours</span></div>
+                    <div class="row"><span class="label">Quality</span><span class="value">HD Streaming</span></div>
+                    <div class="row"><span class="label">Devices</span><span class="value">Unlimited</span></div>
+                </div>
+                <a href="/watch/${filmId}" class="btn">▶ Start Watching</a>
+            `;
+        }
+        
+        function showError() {
+            document.getElementById('card').innerHTML = `
+                <div class="icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">✗</div>
+                <h1 style="color: #ef4444;">Something Went Wrong</h1>
+                <p>We couldn't verify your rental. Please contact support if payment was taken.</p>
+                <a href="/watch" class="btn">Browse Films</a>
+            `;
+        }
+        
+        verify();
+    </script>
+</body>
+</html>
