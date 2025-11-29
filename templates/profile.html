@@ -45,13 +45,8 @@
         .hero-section::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(168,85,247,0.1)" stroke-width="0.5"/></svg>');
-            background-size: 200px;
-            opacity: 0.5;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(168,85,247,0.1) 0%, transparent 50%);
         }
         
         .hero-content {
@@ -116,6 +111,7 @@
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
+            margin-bottom: 20px;
         }
         
         .social-link {
@@ -144,6 +140,45 @@
             font-size: 0.85em;
             font-weight: 600;
             margin-bottom: 15px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+        }
+        
+        .btn-secondary {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.4);
         }
         
         .main-content {
@@ -250,23 +285,6 @@
             text-decoration: none;
         }
         
-        .contact-btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #a855f7, #7c3aed);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 20px;
-            transition: all 0.3s;
-        }
-        
-        .contact-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
-        }
-        
         @media (max-width: 768px) {
             .hero-content {
                 flex-direction: column;
@@ -275,6 +293,9 @@
             .profile-photo { width: 180px; height: 180px; }
             .profile-info h1 { font-size: 2em; }
             .social-links { justify-content: center; }
+            .action-buttons { justify-content: center; }
+            .header { padding: 15px 20px; }
+            .main-content { padding: 30px 20px; }
         }
     </style>
 </head>
@@ -283,8 +304,7 @@
         <a href="/" class="logo">🎬 <span>PACCS</span></a>
         <nav class="nav-links">
             <a href="/filmmakers">Filmmakers</a>
-            <a href="/browse">Browse Films</a>
-            <a href="/spotlight">Spotlight</a>
+            <a href="/dashboard">Dashboard</a>
         </nav>
     </header>
     
@@ -297,7 +317,7 @@
         
         async function loadProfile() {
             try {
-                const response = await fetch(`/api/profile/${profileId}`);
+                const response = await fetch('/api/profile/' + profileId);
                 const data = await response.json();
                 
                 if (data.success) {
@@ -327,31 +347,24 @@
             if (profile.socialLinks) {
                 for (const [platform, url] of Object.entries(profile.socialLinks)) {
                     if (url) {
-                        socialLinksHTML += `
-                            <a href="${url}" target="_blank" class="social-link" title="${platform}">
-                                ${socialIcons[platform] || '🔗'}
-                            </a>
-                        `;
+                        socialLinksHTML += '<a href="' + url + '" target="_blank" class="social-link" title="' + platform + '">' + (socialIcons[platform] || '🔗') + '</a>';
                     }
                 }
             }
             
             let filmsHTML = '';
             if (profile.filmLinks && profile.filmLinks.length > 0) {
-                profile.filmLinks.forEach((url, index) => {
-                    const platform = url.includes('vimeo') ? 'Vimeo' : 
-                                    url.includes('youtube') ? 'YouTube' : 'Watch';
-                    filmsHTML += `
-                        <div class="film-card">
-                            <div class="thumbnail">🎬</div>
-                            <div class="info">
-                                <div class="title">Film ${index + 1}</div>
-                                <a href="${url}" target="_blank" class="link">
-                                    Watch on ${platform} →
-                                </a>
-                            </div>
-                        </div>
-                    `;
+                profile.filmLinks.forEach(function(url, index) {
+                    if (url) {
+                        const platform = url.includes('vimeo') ? 'Vimeo' : url.includes('youtube') ? 'YouTube' : 'Watch';
+                        filmsHTML += '<div class="film-card">' +
+                            '<div class="thumbnail">🎬</div>' +
+                            '<div class="info">' +
+                                '<div class="title">Film ' + (index + 1) + '</div>' +
+                                '<a href="' + url + '" target="_blank" class="link">Watch on ' + platform + ' →</a>' +
+                            '</div>' +
+                        '</div>';
+                    }
                 });
             }
             
@@ -360,61 +373,75 @@
             if (profile.country) locationParts.push(profile.country);
             const locationText = locationParts.join(', ');
             
-            document.getElementById('profileContent').innerHTML = `
-                <section class="hero-section">
-                    <div class="hero-content">
-                        <div class="profile-photo">
-                            ${profile.profilePhoto 
-                                ? `<img src="${profile.profilePhoto}" alt="${profile.fullName}">`
-                                : `<div class="placeholder">${profile.firstName ? profile.firstName[0] : '?'}</div>`
-                            }
-                        </div>
-                        <div class="profile-info">
-                            ${profile.featured ? '<span class="featured-badge">⭐ Featured Filmmaker</span>' : ''}
-                            <h1>${profile.fullName}</h1>
-                            <div class="designation">${profile.designation || 'Filmmaker'}</div>
-                            ${profile.company ? `<div class="company">${profile.company}</div>` : ''}
-                            ${locationText ? `<div class="location">📍 ${locationText}</div>` : ''}
-                            <div class="social-links">
-                                ${socialLinksHTML}
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                
-                <main class="main-content">
-                    ${profile.bio ? `
-                        <section class="section">
-                            <h2>My Story</h2>
-                            <p class="bio-text">${profile.bio}</p>
-                        </section>
-                    ` : ''}
-                    
-                    <section class="section">
-                        <h2>Films & Work</h2>
-                        ${filmsHTML ? `
-                            <div class="films-grid">${filmsHTML}</div>
-                        ` : `
-                            <div class="empty-state">
-                                <div class="icon">🎬</div>
-                                <p>No films added yet</p>
-                            </div>
-                        `}
-                    </section>
-                </main>
-            `;
+            let heroHTML = '<section class="hero-section"><div class="hero-content">';
             
-            document.title = `${profile.fullName} - PACCS`;
+            // Profile photo
+            heroHTML += '<div class="profile-photo">';
+            if (profile.profilePhoto) {
+                heroHTML += '<img src="' + profile.profilePhoto + '" alt="' + profile.fullName + '">';
+            } else {
+                heroHTML += '<div class="placeholder">' + (profile.firstName ? profile.firstName[0] : '?') + '</div>';
+            }
+            heroHTML += '</div>';
+            
+            // Profile info
+            heroHTML += '<div class="profile-info">';
+            if (profile.featured) {
+                heroHTML += '<span class="featured-badge">⭐ Featured Filmmaker</span>';
+            }
+            heroHTML += '<h1>' + profile.fullName + '</h1>';
+            heroHTML += '<div class="designation">' + (profile.designation || 'Filmmaker') + '</div>';
+            if (profile.company) {
+                heroHTML += '<div class="company">' + profile.company + '</div>';
+            }
+            if (locationText) {
+                heroHTML += '<div class="location">📍 ' + locationText + '</div>';
+            }
+            heroHTML += '<div class="social-links">' + socialLinksHTML + '</div>';
+            
+            // Action buttons with PDF download
+            heroHTML += '<div class="action-buttons">';
+            heroHTML += '<a href="/api/filmmaker/' + profileId + '/pdf" class="btn-primary">📄 Download PDF</a>';
+            heroHTML += '<a href="mailto:' + (profile.email || '') + '" class="btn-secondary">✉️ Contact</a>';
+            heroHTML += '</div>';
+            
+            heroHTML += '</div></div></section>';
+            
+            // Main content
+            let mainHTML = '<main class="main-content">';
+            
+            // Bio section
+            if (profile.bio) {
+                mainHTML += '<section class="section">' +
+                    '<h2>My Story</h2>' +
+                    '<p class="bio-text">' + profile.bio + '</p>' +
+                '</section>';
+            }
+            
+            // Films section
+            mainHTML += '<section class="section">' +
+                '<h2>Films & Work</h2>';
+            if (filmsHTML) {
+                mainHTML += '<div class="films-grid">' + filmsHTML + '</div>';
+            } else {
+                mainHTML += '<div class="empty-state">' +
+                    '<div class="icon">🎬</div>' +
+                    '<p>No films added yet</p>' +
+                '</div>';
+            }
+            mainHTML += '</section></main>';
+            
+            document.getElementById('profileContent').innerHTML = heroHTML + mainHTML;
+            document.title = profile.fullName + ' - PACCS';
         }
         
         function showError() {
-            document.getElementById('profileContent').innerHTML = `
-                <div class="error-page">
-                    <h1>Profile Not Found</h1>
-                    <p>This filmmaker profile doesn't exist or has been removed.</p>
-                    <a href="/filmmakers">Browse All Filmmakers</a>
-                </div>
-            `;
+            document.getElementById('profileContent').innerHTML = 
+                '<div class="error-page">' +
+                    '<h1>Profile Not Found</h1>' +
+                    '<p>This filmmaker profile does not exist or has been removed.</p>' +
+                    '<a href="/filmmakers">Browse All Filmmakers</a>' +
+                '</div>';
         }
         
         loadProfile();
