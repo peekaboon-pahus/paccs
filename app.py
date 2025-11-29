@@ -10,6 +10,7 @@ import random
 import uuid
 import re
 from datetime import datetime
+from pdf_report import generate_film_report, generate_filmmaker_report
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'paccs-secret-key-change-in-production')
@@ -690,6 +691,88 @@ def admin_feature_profile(profile_id):
     
     return jsonify({'success': False, 'error': 'Profile not found'}), 404
 
+# ============================================
+# API ROUTES - PDF REPORTS
+# ============================================
+
+@app.route('/api/report/<film_id>/pdf')
+def download_film_report(film_id):
+    """Generate and download PDF report for a film analysis"""
+    from flask import send_file
+    
+    # Get film data (mock for now - in production, fetch from database)
+    film_data = {
+        'title': request.args.get('title', 'Film Analysis'),
+        'genre': request.args.get('genre', 'Drama'),
+        'country': request.args.get('country', 'Unknown'),
+        'runtime': request.args.get('runtime', 'N/A')
+    }
+    
+    # Get analysis data from query params or generate mock
+    analysis_data = {
+        'score': float(request.args.get('score', 7.5)),
+        'pathway': request.args.get('pathway', 'FESTIVAL'),
+        'predictions': {
+            'festival_selection': int(request.args.get('festival_selection', 65)),
+            'distribution_deal': int(request.args.get('distribution_deal', 45)),
+            'award_nomination': int(request.args.get('award_nomination', 25)),
+            'viral_potential': int(request.args.get('viral_potential', 15))
+        },
+        'festivals': [
+            {'name': 'Sundance Film Festival', 'score': 78},
+            {'name': 'Toronto International', 'score': 72},
+            {'name': 'Berlin Film Festival', 'score': 68},
+            {'name': 'Cannes Film Festival', 'score': 55},
+            {'name': 'Venice Film Festival', 'score': 52}
+        ],
+        'distributors': [
+            {'name': 'A24', 'score': 70},
+            {'name': 'Netflix', 'score': 65},
+            {'name': 'Amazon Studios', 'score': 58},
+            {'name': 'MUBI', 'score': 52},
+            {'name': 'Neon', 'score': 48}
+        ]
+    }
+    
+    # Generate PDF
+    pdf_buffer = generate_film_report(film_data, analysis_data)
+    
+    # Create filename
+    safe_title = film_data['title'].replace(' ', '_')[:30]
+    filename = f"PACCS_Report_{safe_title}.pdf"
+    
+    return send_file(
+        pdf_buffer,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=filename
+    )
+
+@app.route('/api/filmmaker/<profile_id>/pdf')
+def download_filmmaker_report(profile_id):
+    """Generate and download PDF profile for a filmmaker"""
+    from flask import send_file
+    
+    profiles = load_profiles()
+    
+    if profile_id not in profiles:
+        return jsonify({'error': 'Profile not found'}), 404
+    
+    profile = profiles[profile_id]
+    
+    # Generate PDF
+    pdf_buffer = generate_filmmaker_report(profile)
+    
+    # Create filename
+    safe_name = profile.get('fullName', 'Filmmaker').replace(' ', '_')[:30]
+    filename = f"PACCS_Profile_{safe_name}.pdf"
+    
+    return send_file(
+        pdf_buffer,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=filename
+    )
 # ============================================
 # API ROUTES - MUSIC & CONTENT
 # ============================================
