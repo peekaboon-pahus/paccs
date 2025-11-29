@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logo { font-size: 1.5em; font-weight: bold; color: #fff; text-decoration: none; }
+        .logo span { color: #a855f7; }
+        
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+        .nav-links a:hover { background: rgba(255,255,255,0.1); }
+        
+        .hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%);
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .hero h1 span { color: #a855f7; }
+        
+        .hero p {
+            font-size: 1.2em;
+            color: rgba(255,255,255,0.7);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .pricing-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .pricing-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px 30px;
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(168, 85, 247, 0.5);
+        }
+        
+        .pricing-card.popular {
+            border-color: #a855f7;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(124, 58, 237, 0.1));
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: 20px;
+            right: -35px;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: white;
+            padding: 5px 40px;
+            font-size: 0.8em;
+            font-weight: 600;
+            transform: rotate(45deg);
+        }
+        
+        .card-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .card-header h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        
+        .card-header .price {
+            font-size: 3em;
+            font-weight: bold;
+            color: #a855f7;
+        }
+        
+        .card-header .price-note {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9em;
+        }
+        
+        .card-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        
+        .card-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .card-features .check {
+            color: #22c55e;
+            font-size: 1.2em;
+        }
+        
+        .btn-buy {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-buy.primary {
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: white;
+        }
+        
+        .btn-buy.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+        }
+        
+        .btn-buy.secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .btn-buy.secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .btn-buy:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .credits-display {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+        
+        .credits-display .label {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 5px;
+        }
+        
+        .credits-display .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #a855f7;
+        }
+        
+        .faq-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        .faq-section h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2em;
+        }
+        
+        .faq-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+        
+        .faq-question:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .faq-answer {
+            padding: 0 20px 20px;
+            color: rgba(255,255,255,0.7);
+            display: none;
+        }
+        
+        .faq-item.open .faq-answer {
+            display: block;
+        }
+        
+        .guarantee {
+            text-align: center;
+            padding: 40px;
+            background: rgba(34, 197, 94, 0.1);
+            border-radius: 20px;
+            margin-top: 40px;
+        }
+        
+        .guarantee h3 {
+            color: #22c55e;
+            margin-bottom: 10px;
+        }
+        
+        .guarantee p {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .loading-overlay.show {
+            display: flex;
+        }
+        
+        .loading-content {
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top-color: #a855f7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 900px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                margin: 0 auto 60px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .header { padding: 15px 20px; }
+            .hero { padding: 40px 20px; }
+            .hero h1 { font-size: 2em; }
+            .pricing-section { padding: 40px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="/" class="logo">🎬 <span>PACCS</span></a>
+        <nav class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/filmmakers">Filmmakers</a>
+            <a href="/pricing" style="background: rgba(168,85,247,0.3);">Pricing</a>
+        </nav>
+    </header>
+    
+    <section class="hero">
+        <h1>Simple, Transparent <span>Pricing</span></h1>
+        <p>Get the credits you need to analyze your films and discover your path to success</p>
+    </section>
+    
+    <section class="pricing-section">
+        <div class="credits-display" id="creditsDisplay" style="display: none;">
+            <div class="label">Your Current Credits</div>
+            <div class="value" id="currentCredits">0</div>
+        </div>
+        
+        <div class="pricing-grid">
+            <!-- Starter -->
+            <div class="pricing-card">
+                <div class="card-header">
+                    <h3>Starter</h3>
+                    <div class="price">£10</div>
+                    <div class="price-note">5 credits • £2.00 each</div>
+                </div>
+                <ul class="card-features">
+                    <li><span class="check">✓</span> 5 Film Analysis Credits</li>
+                    <li><span class="check">✓</span> Festival Recommendations</li>
+                    <li><span class="check">✓</span> Distributor Matching</li>
+                    <li><span class="check">✓</span> PDF Reports</li>
+                    <li><span class="check">✓</span> Success Predictions</li>
+                </ul>
+                <button class="btn-buy secondary" onclick="buyPackage('starter')">
+                    Buy Starter
+                </button>
+            </div>
+            
+            <!-- Pro -->
+            <div class="pricing-card popular">
+                <div class="popular-badge">POPULAR</div>
+                <div class="card-header">
+                    <h3>Pro</h3>
+                    <div class="price">£25</div>
+                    <div class="price-note">15 credits • £1.67 each</div>
+                </div>
+                <ul class="card-features">
+                    <li><span class="check">✓</span> 15 Film Analysis Credits</li>
+                    <li><span class="check">✓</span> Festival Recommendations</li>
+                    <li><span class="check">✓</span> Distributor Matching</li>
+                    <li><span class="check">✓</span> PDF Reports</li>
+                    <li><span class="check">✓</span> Success Predictions</li>
+                    <li><span class="check">✓</span> Priority Support</li>
+                </ul>
+                <button class="btn-buy primary" onclick="buyPackage('pro')">
+                    Buy Pro
+                </button>
+            </div>
+            
+            <!-- Studio -->
+            <div class="pricing-card">
+                <div class="card-header">
+                    <h3>Studio</h3>
+                    <div class="price">£50</div>
+                    <div class="price-note">40 credits • £1.25 each</div>
+                </div>
+                <ul class="card-features">
+                    <li><span class="check">✓</span> 40 Film Analysis Credits</li>
+                    <li><span class="check">✓</span> Festival Recommendations</li>
+                    <li><span class="check">✓</span> Distributor Matching</li>
+                    <li><span class="check">✓</span> PDF Reports</li>
+                    <li><span class="check">✓</span> Success Predictions</li>
+                    <li><span class="check">✓</span> Priority Support</li>
+                    <li><span class="check">✓</span> Bulk Analysis Tools</li>
+                </ul>
+                <button class="btn-buy secondary" onclick="buyPackage('studio')">
+                    Buy Studio
+                </button>
+            </div>
+        </div>
+        
+        <div class="guarantee">
+            <h3>🛡️ 100% Satisfaction Guarantee</h3>
+            <p>Not happy with your analysis? Contact us within 7 days for a full refund.</p>
+        </div>
+    </section>
+    
+    <section class="faq-section">
+        <h2>Frequently Asked Questions</h2>
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                What is a credit?
+                <span>+</span>
+            </div>
+            <div class="faq-answer">
+                One credit allows you to analyze one film. Each analysis includes a comprehensive score, festival recommendations, distributor matches, success predictions, and a downloadable PDF report.
+            </div>
+        </div>
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                Do credits expire?
+                <span>+</span>
+            </div>
+            <div class="faq-answer">
+                No! Your credits never expire. Use them whenever you're ready to analyze your films.
+            </div>
+        </div>
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                Can I get a refund?
+                <span>+</span>
+            </div>
+            <div class="faq-answer">
+                Yes! We offer a 7-day satisfaction guarantee. If you're not happy with our service, contact us for a full refund.
+            </div>
+        </div>
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                How accurate are the predictions?
+                <span>+</span>
+            </div>
+            <div class="faq-answer">
+                Our AI has been trained on 4,726+ real film submissions and festival outcomes. While no prediction is 100% accurate, our system provides data-driven insights that have helped filmmakers improve their festival acceptance rates.
+            </div>
+        </div>
+    </section>
+    
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Redirecting to checkout...</p>
+        </div>
+    </div>
+    
+    <script>
+        // Check if user is logged in and show credits
+        const user = JSON.parse(localStorage.getItem('paccs_user') || 'null');
+        
+        if (user) {
+            document.getElementById('creditsDisplay').style.display = 'block';
+            document.getElementById('currentCredits').textContent = user.credits || 0;
+        }
+        
+        async function buyPackage(packageId) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('show');
+            
+            try {
+                const response = await fetch('/api/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        package: packageId,
+                        email: user ? user.email : ''
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.url) {
+                    window.location.href = data.url;
+                } else if (data.error) {
+                    alert('Error: ' + data.error);
+                    loadingOverlay.classList.remove('show');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again.');
+                loadingOverlay.classList.remove('show');
+            }
+        }
+        
+        function toggleFaq(element) {
+            element.classList.toggle('open');
+            const icon = element.querySelector('.faq-question span');
+            icon.textContent = element.classList.contains('open') ? '−' : '+';
+        }
+    </script>
+</body>
+</html>

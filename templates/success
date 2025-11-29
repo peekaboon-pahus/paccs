@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logo { font-size: 1.5em; font-weight: bold; color: #fff; text-decoration: none; }
+        .logo span { color: #a855f7; }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+        
+        .success-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 30px;
+            padding: 60px;
+            text-align: center;
+            max-width: 500px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            margin: 0 auto 30px;
+            animation: scaleIn 0.5s ease;
+        }
+        
+        @keyframes scaleIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .success-card h1 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #22c55e;
+        }
+        
+        .success-card p {
+            color: rgba(255,255,255,0.7);
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+        
+        .credits-added {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .credits-added .label {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .credits-added .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #22c55e;
+        }
+        
+        .new-balance {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .new-balance .label {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .new-balance .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #a855f7;
+        }
+        
+        .btn-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+        }
+        
+        .loading {
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top-color: #a855f7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            color: #fca5a5;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="/" class="logo">🎬 <span>PACCS</span></a>
+    </header>
+    
+    <main class="main-content">
+        <div class="success-card" id="successCard">
+            <div class="loading" id="loadingState">
+                <div class="spinner"></div>
+                <p>Verifying your payment...</p>
+            </div>
+            
+            <div id="successState" style="display: none;">
+                <div class="success-icon">✓</div>
+                <h1>Payment Successful!</h1>
+                <p>Thank you for your purchase. Your credits have been added to your account.</p>
+                
+                <div class="credits-added">
+                    <div class="label">Credits Added</div>
+                    <div class="value" id="creditsAdded">+0</div>
+                </div>
+                
+                <div class="new-balance">
+                    <div class="label">Your New Balance</div>
+                    <div class="value" id="newBalance">0 credits</div>
+                </div>
+                
+                <a href="/dashboard" class="btn-primary">Go to Dashboard →</a>
+            </div>
+            
+            <div id="errorState" style="display: none;">
+                <div class="error-message" id="errorMessage"></div>
+                <a href="/pricing" class="btn-primary">Back to Pricing</a>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        async function verifyPayment() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session_id');
+            
+            if (!sessionId) {
+                showError('No payment session found. Please try again.');
+                return;
+            }
+            
+            const user = JSON.parse(localStorage.getItem('paccs_user') || 'null');
+            
+            try {
+                const response = await fetch('/api/verify-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        email: user ? user.email : ''
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update local storage
+                    if (user) {
+                        user.credits = data.new_balance || (user.credits + data.credits_added);
+                        localStorage.setItem('paccs_user', JSON.stringify(user));
+                    }
+                    
+                    // Show success
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('successState').style.display = 'block';
+                    document.getElementById('creditsAdded').textContent = '+' + data.credits_added;
+                    document.getElementById('newBalance').textContent = (data.new_balance || data.credits_added) + ' credits';
+                } else {
+                    showError(data.error || 'Payment verification failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Unable to verify payment. Please contact support.');
+            }
+        }
+        
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
+        
+        // Start verification
+        verifyPayment();
+    </script>
+</body>
+</html>
