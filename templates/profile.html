@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filmmaker Profile - PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logo { font-size: 1.5em; font-weight: bold; color: #fff; text-decoration: none; }
+        .logo span { color: #a855f7; }
+        
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+        .nav-links a:hover { background: rgba(255,255,255,0.1); }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%);
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(168,85,247,0.1)" stroke-width="0.5"/></svg>');
+            background-size: 200px;
+            opacity: 0.5;
+        }
+        
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 50px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .profile-photo {
+            width: 250px;
+            height: 250px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 4px solid rgba(168, 85, 247, 0.5);
+            flex-shrink: 0;
+        }
+        
+        .profile-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-photo .placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5em;
+        }
+        
+        .profile-info h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+        }
+        
+        .profile-info .designation {
+            font-size: 1.3em;
+            color: #a855f7;
+            margin-bottom: 5px;
+        }
+        
+        .profile-info .company {
+            font-size: 1.1em;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 15px;
+        }
+        
+        .profile-info .location {
+            color: rgba(255,255,255,0.6);
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 1.3em;
+            transition: all 0.2s;
+        }
+        
+        .social-link:hover {
+            background: #a855f7;
+            transform: translateY(-3px);
+        }
+        
+        .featured-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 40px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(168, 85, 247, 0.3);
+        }
+        
+        .bio-text {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.85);
+            white-space: pre-wrap;
+        }
+        
+        .films-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .film-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        
+        .film-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(168, 85, 247, 0.5);
+        }
+        
+        .film-card .thumbnail {
+            height: 180px;
+            background: linear-gradient(135deg, #1a1a2e, #0f0f1a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+        }
+        
+        .film-card .info {
+            padding: 20px;
+        }
+        
+        .film-card .title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .film-card .link {
+            color: #a855f7;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .film-card .link:hover { text-decoration: underline; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .empty-state .icon { font-size: 4em; margin-bottom: 20px; }
+        
+        .loading {
+            text-align: center;
+            padding: 100px;
+            font-size: 1.2em;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .error-page {
+            text-align: center;
+            padding: 100px 40px;
+        }
+        
+        .error-page h1 { font-size: 3em; margin-bottom: 20px; }
+        .error-page p { color: rgba(255,255,255,0.6); margin-bottom: 30px; }
+        .error-page a {
+            display: inline-block;
+            background: #a855f7;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+        }
+        
+        .contact-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            .profile-photo { width: 180px; height: 180px; }
+            .profile-info h1 { font-size: 2em; }
+            .social-links { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="/" class="logo">🎬 <span>PACCS</span></a>
+        <nav class="nav-links">
+            <a href="/filmmakers">Filmmakers</a>
+            <a href="/browse">Browse Films</a>
+            <a href="/spotlight">Spotlight</a>
+        </nav>
+    </header>
+    
+    <div id="profileContent">
+        <div class="loading">Loading profile...</div>
+    </div>
+    
+    <script>
+        const profileId = window.location.pathname.split('/').pop();
+        
+        async function loadProfile() {
+            try {
+                const response = await fetch(`/api/profile/${profileId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderProfile(data.profile);
+                } else {
+                    showError();
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showError();
+            }
+        }
+        
+        function renderProfile(profile) {
+            const socialIcons = {
+                vimeo: '🎬',
+                youtube: '▶️',
+                instagram: '📷',
+                linkedin: '💼',
+                twitter: '🐦',
+                website: '🌐',
+                imdb: '🎥',
+                letterboxd: '🎞️'
+            };
+            
+            let socialLinksHTML = '';
+            if (profile.socialLinks) {
+                for (const [platform, url] of Object.entries(profile.socialLinks)) {
+                    if (url) {
+                        socialLinksHTML += `
+                            <a href="${url}" target="_blank" class="social-link" title="${platform}">
+                                ${socialIcons[platform] || '🔗'}
+                            </a>
+                        `;
+                    }
+                }
+            }
+            
+            let filmsHTML = '';
+            if (profile.filmLinks && profile.filmLinks.length > 0) {
+                profile.filmLinks.forEach((url, index) => {
+                    const platform = url.includes('vimeo') ? 'Vimeo' : 
+                                    url.includes('youtube') ? 'YouTube' : 'Watch';
+                    filmsHTML += `
+                        <div class="film-card">
+                            <div class="thumbnail">🎬</div>
+                            <div class="info">
+                                <div class="title">Film ${index + 1}</div>
+                                <a href="${url}" target="_blank" class="link">
+                                    Watch on ${platform} →
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            const locationParts = [];
+            if (profile.city) locationParts.push(profile.city);
+            if (profile.country) locationParts.push(profile.country);
+            const locationText = locationParts.join(', ');
+            
+            document.getElementById('profileContent').innerHTML = `
+                <section class="hero-section">
+                    <div class="hero-content">
+                        <div class="profile-photo">
+                            ${profile.profilePhoto 
+                                ? `<img src="${profile.profilePhoto}" alt="${profile.fullName}">`
+                                : `<div class="placeholder">${profile.firstName ? profile.firstName[0] : '?'}</div>`
+                            }
+                        </div>
+                        <div class="profile-info">
+                            ${profile.featured ? '<span class="featured-badge">⭐ Featured Filmmaker</span>' : ''}
+                            <h1>${profile.fullName}</h1>
+                            <div class="designation">${profile.designation || 'Filmmaker'}</div>
+                            ${profile.company ? `<div class="company">${profile.company}</div>` : ''}
+                            ${locationText ? `<div class="location">📍 ${locationText}</div>` : ''}
+                            <div class="social-links">
+                                ${socialLinksHTML}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <main class="main-content">
+                    ${profile.bio ? `
+                        <section class="section">
+                            <h2>My Story</h2>
+                            <p class="bio-text">${profile.bio}</p>
+                        </section>
+                    ` : ''}
+                    
+                    <section class="section">
+                        <h2>Films & Work</h2>
+                        ${filmsHTML ? `
+                            <div class="films-grid">${filmsHTML}</div>
+                        ` : `
+                            <div class="empty-state">
+                                <div class="icon">🎬</div>
+                                <p>No films added yet</p>
+                            </div>
+                        `}
+                    </section>
+                </main>
+            `;
+            
+            document.title = `${profile.fullName} - PACCS`;
+        }
+        
+        function showError() {
+            document.getElementById('profileContent').innerHTML = `
+                <div class="error-page">
+                    <h1>Profile Not Found</h1>
+                    <p>This filmmaker profile doesn't exist or has been removed.</p>
+                    <a href="/filmmakers">Browse All Filmmakers</a>
+                </div>
+            `;
+        }
+        
+        loadProfile();
+    </script>
+</body>
+</html>

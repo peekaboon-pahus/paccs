@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pⁿ Club - Filmmaker Directory | PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logo { font-size: 1.5em; font-weight: bold; color: #fff; text-decoration: none; }
+        .logo span { color: #a855f7; }
+        
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+        .nav-links a:hover { background: rgba(255,255,255,0.1); }
+        .nav-links a.active { background: #a855f7; color: white; }
+        
+        .btn-join {
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-join:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(168, 85, 247, 0.4);
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%);
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .hero h1 span { color: #a855f7; }
+        
+        .hero p {
+            font-size: 1.2em;
+            color: rgba(255,255,255,0.7);
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-top: 30px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #a855f7;
+        }
+        
+        .stat-label {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.95em;
+        }
+        
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 50px 40px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            padding: 14px 20px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 1em;
+        }
+        
+        .search-box::placeholder { color: rgba(255,255,255,0.4); }
+        .search-box:focus {
+            outline: none;
+            border-color: #a855f7;
+        }
+        
+        .filter-select {
+            padding: 14px 20px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        
+        .filter-select option {
+            background: #1a1a1a;
+            color: #fff;
+        }
+        
+        .filmmakers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .filmmaker-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .filmmaker-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(168, 85, 247, 0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card-photo {
+            height: 280px;
+            background: linear-gradient(135deg, #1a1a2e, #0f0f1a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .card-photo .placeholder {
+            font-size: 5em;
+            color: rgba(255,255,255,0.2);
+        }
+        
+        .featured-ribbon {
+            position: absolute;
+            top: 15px;
+            right: -35px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 5px 40px;
+            font-size: 0.8em;
+            font-weight: 600;
+            transform: rotate(45deg);
+        }
+        
+        .card-info {
+            padding: 25px;
+        }
+        
+        .card-info h3 {
+            font-size: 1.3em;
+            margin-bottom: 8px;
+        }
+        
+        .card-info .designation {
+            color: #a855f7;
+            font-size: 0.95em;
+            margin-bottom: 5px;
+        }
+        
+        .card-info .company {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        
+        .card-info .location {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85em;
+        }
+        
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .films-count {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9em;
+        }
+        
+        .view-profile {
+            color: #a855f7;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .empty-state .icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .empty-state p {
+            margin-bottom: 30px;
+        }
+        
+        .empty-state a {
+            display: inline-block;
+            background: #a855f7;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 80px;
+            font-size: 1.2em;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        @media (max-width: 768px) {
+            .header { padding: 15px 20px; }
+            .hero { padding: 40px 20px; }
+            .hero h1 { font-size: 2em; }
+            .hero-stats { gap: 30px; }
+            .stat-value { font-size: 1.8em; }
+            .main-content { padding: 30px 20px; }
+            .filters { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="/" class="logo">🎬 <span>PACCS</span></a>
+        <nav class="nav-links">
+            <a href="/filmmakers" class="active">Filmmakers</a>
+            <a href="/browse">Browse Films</a>
+            <a href="/spotlight">Spotlight</a>
+            <a href="/signup" class="btn-join">Join Pⁿ Club</a>
+        </nav>
+    </header>
+    
+    <section class="hero">
+        <h1>Peekaboo<span>ⁿ</span> Club</h1>
+        <p>Discover talented filmmakers from around the world. Showcase your work, network, and get discovered.</p>
+        <div class="hero-stats">
+            <div class="stat">
+                <div class="stat-value" id="totalFilmmakers">0</div>
+                <div class="stat-label">Filmmakers</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="totalCountries">12</div>
+                <div class="stat-label">Countries</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="totalFilms">50+</div>
+                <div class="stat-label">Films</div>
+            </div>
+        </div>
+    </section>
+    
+    <main class="main-content">
+        <div class="filters">
+            <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search filmmakers by name, designation...">
+            <select class="filter-select" id="countryFilter">
+                <option value="">All Countries</option>
+                <option value="UK">United Kingdom</option>
+                <option value="US">United States</option>
+                <option value="IN">India</option>
+                <option value="CA">Canada</option>
+                <option value="AU">Australia</option>
+                <option value="SG">Singapore</option>
+                <option value="TH">Thailand</option>
+                <option value="JP">Japan</option>
+                <option value="KR">South Korea</option>
+            </select>
+        </div>
+        
+        <div id="filmmakersGrid" class="filmmakers-grid">
+            <div class="loading">Loading filmmakers...</div>
+        </div>
+    </main>
+    
+    <script>
+        let allFilmmakers = [];
+        
+        async function loadFilmmakers() {
+            try {
+                const response = await fetch('/api/filmmakers');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allFilmmakers = data.filmmakers;
+                    document.getElementById('totalFilmmakers').textContent = data.total;
+                    renderFilmmakers(allFilmmakers);
+                } else {
+                    showEmpty();
+                }
+            } catch (error) {
+                console.error('Error loading filmmakers:', error);
+                showEmpty();
+            }
+        }
+        
+        function renderFilmmakers(filmmakers) {
+            const grid = document.getElementById('filmmakersGrid');
+            
+            if (filmmakers.length === 0) {
+                showEmpty();
+                return;
+            }
+            
+            grid.innerHTML = filmmakers.map(filmmaker => `
+                <a href="/filmmaker/${filmmaker.id}" class="filmmaker-card">
+                    <div class="card-photo">
+                        ${filmmaker.profilePhoto 
+                            ? `<img src="${filmmaker.profilePhoto}" alt="${filmmaker.fullName}">`
+                            : `<div class="placeholder">${filmmaker.fullName ? filmmaker.fullName[0] : '?'}</div>`
+                        }
+                        ${filmmaker.featured ? '<div class="featured-ribbon">⭐ Featured</div>' : ''}
+                    </div>
+                    <div class="card-info">
+                        <h3>${filmmaker.fullName}</h3>
+                        <div class="designation">${filmmaker.designation || 'Filmmaker'}</div>
+                        ${filmmaker.company ? `<div class="company">${filmmaker.company}</div>` : ''}
+                        ${filmmaker.country ? `<div class="location">📍 ${filmmaker.country}</div>` : ''}
+                    </div>
+                    <div class="card-footer">
+                        <span class="films-count">🎬 ${filmmaker.films_count || 0} films</span>
+                        <span class="view-profile">View Profile →</span>
+                    </div>
+                </a>
+            `).join('');
+        }
+        
+        function showEmpty() {
+            document.getElementById('filmmakersGrid').innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div class="icon">🎬</div>
+                    <h2>No Filmmakers Yet</h2>
+                    <p>Be the first to join our creative community!</p>
+                    <a href="/signup">Create Your Profile</a>
+                </div>
+            `;
+        }
+        
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const country = document.getElementById('countryFilter').value;
+            filterFilmmakers(query, country);
+        });
+        
+        document.getElementById('countryFilter').addEventListener('change', (e) => {
+            const country = e.target.value;
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            filterFilmmakers(query, country);
+        });
+        
+        function filterFilmmakers(query, country) {
+            let filtered = allFilmmakers;
+            
+            if (query) {
+                filtered = filtered.filter(f => 
+                    f.fullName.toLowerCase().includes(query) ||
+                    (f.designation && f.designation.toLowerCase().includes(query)) ||
+                    (f.company && f.company.toLowerCase().includes(query))
+                );
+            }
+            
+            if (country) {
+                filtered = filtered.filter(f => f.country === country);
+            }
+            
+            renderFilmmakers(filtered);
+        }
+        
+        loadFilmmakers();
+    </script>
+</body>
+</html>

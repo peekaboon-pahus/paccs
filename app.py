@@ -1,6 +1,6 @@
 """
 PACCS - Peekaboon Agentic Creative Curation System
-Production Flask Application with Enhanced Filmmaker Profiles
+Production Flask Application with AI Moderation
 """
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 import json
@@ -8,10 +8,206 @@ import os
 import hashlib
 import random
 import uuid
+import re
 from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'paccs-secret-key-change-in-production')
+
+# ============================================
+# AI MODERATION SYSTEM
+# ============================================
+
+# Offensive words list (basic - in production use a proper library)
+OFFENSIVE_WORDS = [
+    'hate', 'kill', 'violence', 'terrorist', 'abuse', 'racist', 'nazi',
+    'porn', 'xxx', 'nude', 'nsfw', 'sex', 'explicit',
+    'scam', 'fraud', 'hack', 'spam', 'crypto', 'bitcoin', 'invest now',
+    'click here', 'free money', 'make money fast', 'get rich'
+]
+
+SPAM_PATTERNS = [
+    r'earn \$?\d+', r'make \$?\d+', r'click here', r'buy now',
+    r'limited offer', r'act now', r'free trial', r'no risk',
+    r'100% free', r'winner', r'congratulations', r'selected'
+]
+
+def moderate_content(profile_data):
+    """
+    AI-powered content moderation
+    Returns: { score: 0-100, status: str, flags: list, reasons: list }
+    """
+    flags = []
+    reasons = []
+    score = 100  # Start with perfect score
+    
+    # Get text content
+    bio = profile_data.get('bio', '').lower()
+    full_name = f"{profile_data.get('firstName', '')} {profile_data.get('lastName', '')}".lower()
+    designation = profile_data.get('designation', '').lower()
+    company = profile_data.get('company', '').lower()
+    all_text = f"{bio} {full_name} {designation} {company}"
+    
+    # ============================================
+    # CHECK 1: Offensive Language
+    # ============================================
+    offensive_found = []
+    for word in OFFENSIVE_WORDS:
+        if word in all_text:
+            offensive_found.append(word)
+    
+    if offensive_found:
+        flags.append('offensive_language')
+        reasons.append(f"Potentially offensive content detected: {', '.join(offensive_found[:3])}")
+        score -= 40
+    
+    # ============================================
+    # CHECK 2: Spam Patterns
+    # ============================================
+    spam_found = False
+    for pattern in SPAM_PATTERNS:
+        if re.search(pattern, all_text, re.IGNORECASE):
+            spam_found = True
+            break
+    
+    if spam_found:
+        flags.append('spam_detected')
+        reasons.append("Content appears to contain spam or promotional material")
+        score -= 30
+    
+    # ============================================
+    # CHECK 3: Bio Quality
+    # ============================================
+    bio_length = len(profile_data.get('bio', ''))
+    
+    if bio_length < 20:
+        flags.append('low_quality_bio')
+        reasons.append("Bio is too short (less than 20 characters)")
+        score -= 15
+    elif bio_length < 50:
+        flags.append('short_bio')
+        reasons.append("Bio could be more detailed")
+        score -= 5
+    
+    # ============================================
+    # CHECK 4: Suspicious Name Patterns
+    # ============================================
+    name = full_name.strip()
+    
+    # Check for numbers in name
+    if re.search(r'\d', name):
+        flags.append('suspicious_name')
+        reasons.append("Name contains numbers")
+        score -= 20
+    
+    # Check for very short name
+    if len(name) < 3:
+        flags.append('invalid_name')
+        reasons.append("Name is too short")
+        score -= 25
+    
+    # Check for all caps
+    original_name = f"{profile_data.get('firstName', '')} {profile_data.get('lastName', '')}"
+    if original_name.isupper() and len(original_name) > 3:
+        flags.append('all_caps_name')
+        reasons.append("Name is in all capitals")
+        score -= 10
+    
+    # ============================================
+    # CHECK 5: URL Validation
+    # ============================================
+    social_links = profile_data.get('socialLinks', {})
+    film_links = profile_data.get('filmLinks', [])
+    all_links = list(social_links.values()) + film_links
+    
+    suspicious_domains = ['bit.ly', 'tinyurl', 't.co', 'goo.gl', 'shorturl']
+    
+    for link in all_links:
+        if link:
+            link_lower = link.lower()
+            # Check for suspicious shortened URLs
+            for domain in suspicious_domains:
+                if domain in link_lower:
+                    flags.append('suspicious_links')
+                    reasons.append("Contains shortened URLs which may be suspicious")
+                    score -= 15
+                    break
+            
+            # Check for non-http links
+            if link and not link.startswith(('http://', 'https://')):
+                if not 'invalid_url_format' in flags:
+                    flags.append('invalid_url_format')
+                    reasons.append("Some URLs have invalid format")
+                    score -= 5
+    
+    # ============================================
+    # CHECK 6: Duplicate/Plagiarism Check
+    # ============================================
+    # In production, compare bio against database of existing bios
+    common_placeholder_bios = [
+        'test', 'testing', 'asdf', 'lorem ipsum', 'sample bio',
+        'bio here', 'about me', 'description', 'filmmaker bio'
+    ]
+    
+    for placeholder in common_placeholder_bios:
+        if bio.strip() == placeholder or bio.strip().startswith(placeholder):
+            flags.append('placeholder_content')
+            reasons.append("Bio appears to be placeholder/test content")
+            score -= 30
+            break
+    
+    # ============================================
+    # CHECK 7: Professional Quality Score
+    # ============================================
+    professional_score = 0
+    
+    # Has social links
+    valid_social_links = sum(1 for v in social_links.values() if v)
+    if valid_social_links >= 2:
+        professional_score += 10
+    elif valid_social_links >= 1:
+        professional_score += 5
+    
+    # Has film links
+    valid_film_links = len([l for l in film_links if l])
+    if valid_film_links >= 1:
+        professional_score += 10
+    
+    # Has designation
+    if profile_data.get('designation'):
+        professional_score += 5
+    
+    # Has company
+    if profile_data.get('company'):
+        professional_score += 5
+    
+    # Good bio length
+    if bio_length >= 100:
+        professional_score += 10
+    
+    # Add professional score bonus
+    score = min(100, score + professional_score)
+    
+    # ============================================
+    # DETERMINE STATUS
+    # ============================================
+    score = max(0, min(100, score))  # Clamp between 0-100
+    
+    if score >= 80:
+        status = 'auto_approved'
+    elif score >= 50:
+        status = 'pending_review'
+    else:
+        status = 'flagged'
+    
+    return {
+        'score': score,
+        'status': status,
+        'flags': flags,
+        'reasons': reasons,
+        'checks_passed': 7 - len(flags),
+        'total_checks': 7
+    }
 
 # ============================================
 # DATA LOADING
@@ -98,6 +294,10 @@ def filmmaker_profile(profile_id):
 def spotlight_page():
     return render_template('spotlight.html')
 
+@app.route('/admin')
+def admin_page():
+    return render_template('admin.html')
+
 # ============================================
 # API ROUTES - FILMS
 # ============================================
@@ -173,6 +373,9 @@ def api_signup():
     if not first_name or not last_name:
         return jsonify({'success': False, 'error': 'Name is required'})
     
+    # Run AI moderation
+    moderation = moderate_content(data)
+    
     user_id = f"USER_{len(users) + 1:05d}"
     profile_id = str(uuid.uuid4())[:8]
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
@@ -207,7 +410,11 @@ def api_signup():
         'socialLinks': data.get('socialLinks', {}),
         'filmLinks': data.get('filmLinks', []),
         'films': [],
-        'status': 'pending',
+        # AI Moderation results
+        'status': moderation['status'],
+        'moderation_score': moderation['score'],
+        'moderation_flags': moderation['flags'],
+        'moderation_reasons': moderation['reasons'],
         'featured': False,
         'spotlight': False,
         'created_at': datetime.now().isoformat(),
@@ -221,7 +428,8 @@ def api_signup():
         'success': True,
         'user_id': user_id,
         'profile_id': profile_id,
-        'credits': 3
+        'credits': 3,
+        'moderation_status': moderation['status']
     })
 
 @app.route('/api/login', methods=['POST'])
@@ -311,6 +519,11 @@ def get_profile(profile_id):
     
     if profile_id in profiles:
         profile = profiles[profile_id]
+        
+        # Only show approved or auto_approved profiles publicly
+        if profile.get('status') not in ['approved', 'auto_approved'] and not profile.get('featured'):
+            return jsonify({'success': False, 'error': 'Profile not available'}), 404
+        
         safe_profile = {
             'id': profile['id'],
             'fullName': profile['fullName'],
@@ -356,16 +569,18 @@ def get_filmmakers():
     
     filmmakers = []
     for profile_id, profile in profiles.items():
-        filmmakers.append({
-            'id': profile['id'],
-            'fullName': profile['fullName'],
-            'designation': profile['designation'],
-            'company': profile.get('company', ''),
-            'country': profile.get('country', ''),
-            'profilePhoto': profile.get('profilePhoto', ''),
-            'featured': profile.get('featured', False),
-            'films_count': len(profile.get('films', []))
-        })
+        # Only show approved, auto_approved, or featured profiles
+        if profile.get('status') in ['approved', 'auto_approved'] or profile.get('featured'):
+            filmmakers.append({
+                'id': profile['id'],
+                'fullName': profile['fullName'],
+                'designation': profile['designation'],
+                'company': profile.get('company', ''),
+                'country': profile.get('country', ''),
+                'profilePhoto': profile.get('profilePhoto', ''),
+                'featured': profile.get('featured', False),
+                'films_count': len(profile.get('films', [])) + len(profile.get('filmLinks', []))
+            })
     
     filmmakers.sort(key=lambda x: (not x['featured'], x['fullName']))
     
@@ -425,6 +640,9 @@ def admin_get_profiles():
             'designation': profile['designation'],
             'status': profile.get('status', 'pending'),
             'featured': profile.get('featured', False),
+            'moderation_score': profile.get('moderation_score', 0),
+            'moderation_flags': profile.get('moderation_flags', []),
+            'moderation_reasons': profile.get('moderation_reasons', []),
             'created_at': profile.get('created_at', '')
         })
     
@@ -444,6 +662,18 @@ def admin_approve_profile(profile_id):
         profiles[profile_id]['updated_at'] = datetime.now().isoformat()
         save_profiles(profiles)
         return jsonify({'success': True, 'message': 'Profile approved'})
+    
+    return jsonify({'success': False, 'error': 'Profile not found'}), 404
+
+@app.route('/api/admin/profile/<profile_id>/reject', methods=['POST'])
+def admin_reject_profile(profile_id):
+    profiles = load_profiles()
+    
+    if profile_id in profiles:
+        profiles[profile_id]['status'] = 'rejected'
+        profiles[profile_id]['updated_at'] = datetime.now().isoformat()
+        save_profiles(profiles)
+        return jsonify({'success': True, 'message': 'Profile rejected'})
     
     return jsonify({'success': False, 'error': 'Profile not found'}), 404
 
@@ -519,6 +749,7 @@ if __name__ == '__main__':
     
     print("\n" + "="*60)
     print("PACCS - AI Film Intelligence Platform")
+    print("With AI-Powered Content Moderation")
     print("="*60)
     print(f"\nLoaded {len(films_data)} films")
     print(f"Running on http://localhost:{port}")
