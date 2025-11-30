@@ -70,9 +70,21 @@ def save_profiles(profiles): save_json('paccs_profiles.json', profiles)
 def load_payments(): return load_json('paccs_payments.json', [])
 def save_payments(payments): save_json('paccs_payments.json', payments)
 def load_streaming_films(): return load_json('paccs_streaming.json', [])
-def save_streaming_films(films): save_json('paccs_streaming.json', films)
+def save_streaming_films(films):
+    try:
+        save_json('paccs_streaming.json', films)
+    except Exception as e:
+        print(f"Error saving streaming films: {e}")
 def load_rentals(): return load_json('paccs_rentals.json', [])
 def save_rentals(rentals): save_json('paccs_rentals.json', rentals)
+def load_music(): return load_json('paccs_music.json', [])
+def save_music(tracks): 
+    try:
+        save_json('paccs_music.json', tracks)
+    except Exception as e:
+        print(f"Error saving music: {e}")
+def load_music_licenses(): return load_json('paccs_music_licenses.json', [])
+def save_music_licenses(licenses): save_json('paccs_music_licenses.json', licenses)
 
 films_data = load_films()
 print(f"Loaded {len(films_data)} films")
@@ -117,9 +129,6 @@ def spotlight_page(): return render_template('spotlight.html')
 @app.route('/admin')
 def admin_page(): return render_template('admin.html')
 
-@app.route('/admin-streaming')
-def admin_streaming_page(): return render_template('admin_streaming.html')
-
 @app.route('/pricing')
 def pricing_page(): return render_template('pricing.html')
 
@@ -141,6 +150,22 @@ def upload_page(): return render_template('upload.html')
 
 @app.route('/rent-success')
 def rent_success(): return render_template('rent_success.html')
+
+@app.route('/admin-streaming')
+def admin_streaming_page(): return render_template('admin_streaming.html')
+
+# Music Pages
+@app.route('/music-browse')
+def music_browse(): return render_template('music_browse.html')
+
+@app.route('/music-upload')
+def music_upload(): return render_template('music_upload.html')
+
+@app.route('/music-license/<track_id>')
+def music_license(track_id): return render_template('music_license.html', track_id=track_id)
+
+@app.route('/admin-music')
+def admin_music_page(): return render_template('admin_music.html')
 
 # ============================================
 # API ROUTES - FILMS & ANALYSIS
@@ -278,36 +303,41 @@ def get_streaming_film(film_id):
 
 @app.route('/api/streaming/upload', methods=['POST'])
 def upload_streaming_film():
-    data = request.json
-    films = load_streaming_films()
-    
-    film_id = str(uuid.uuid4())[:8]
-    new_film = {
-        'id': film_id,
-        'title': data.get('title', 'Untitled'),
-        'genre': data.get('genre', ''),
-        'duration': data.get('duration', ''),
-        'year': data.get('year', '2024'),
-        'country': data.get('country', ''),
-        'description': data.get('description', ''),
-        'tags': data.get('tags', []),
-        'video_url': data.get('video_url', ''),
-        'thumbnail': data.get('thumbnail', ''),
-        'price': data.get('price', 5),
-        'filmmaker': data.get('filmmaker', ''),
-        'filmmaker_id': data.get('filmmaker_id', ''),
-        'filmmaker_email': data.get('filmmaker_email', ''),
-        'status': 'pending_review',
-        'featured': False,
-        'views': 0,
-        'rentals': 0,
-        'earnings': 0,
-        'created_at': datetime.now().isoformat()
-    }
-    
-    films.append(new_film)
-    save_streaming_films(films)
-    return jsonify({'success': True, 'film_id': film_id, 'message': 'Film submitted for review'})
+    try:
+        data = request.json
+        films = load_streaming_films()
+        
+        film_id = str(uuid.uuid4())[:8]
+        new_film = {
+            'id': film_id,
+            'title': data.get('title', 'Untitled'),
+            'genre': data.get('genre', ''),
+            'duration': data.get('duration', ''),
+            'year': data.get('year', '2024'),
+            'country': data.get('country', ''),
+            'description': data.get('description', ''),
+            'tags': data.get('tags', []),
+            'video_url': data.get('video_url', ''),
+            'thumbnail': data.get('thumbnail', ''),
+            'price': data.get('price', 5),
+            'filmmaker': data.get('filmmaker', ''),
+            'filmmaker_id': data.get('filmmaker_id', ''),
+            'filmmaker_email': data.get('filmmaker_email', ''),
+            'status': 'pending_review',
+            'featured': False,
+            'views': 0,
+            'rentals': 0,
+            'earnings': 0,
+            'created_at': datetime.now().isoformat()
+        }
+        
+        films.append(new_film)
+        save_streaming_films(films)
+        print(f"Film uploaded: {film_id} - {new_film['title']}")
+        return jsonify({'success': True, 'film_id': film_id, 'message': 'Film submitted for review'})
+    except Exception as e:
+        print(f"Upload error: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/streaming/check-access/<film_id>')
 def check_film_access(film_id):
@@ -420,6 +450,102 @@ def feature_streaming_film(film_id):
         if f['id'] == film_id: f['status'] = 'approved'
     save_streaming_films(films)
     return jsonify({'success': True})
+
+# ============================================
+# API ROUTES - MUSIC MARKETPLACE
+# ============================================
+
+@app.route('/api/music/tracks')
+def get_music_tracks():
+    tracks = load_music()
+    approved = [t for t in tracks if t.get('status') == 'approved']
+    return jsonify({'success': True, 'tracks': approved, 'total': len(approved)})
+
+@app.route('/api/music/track/<track_id>')
+def get_music_track(track_id):
+    tracks = load_music()
+    track = next((t for t in tracks if t['id'] == track_id), None)
+    if track: return jsonify({'success': True, 'track': track})
+    return jsonify({'success': False, 'error': 'Track not found'}), 404
+
+@app.route('/api/music/upload', methods=['POST'])
+def upload_music():
+    try:
+        data = request.json
+        tracks = load_music()
+        
+        track_id = str(uuid.uuid4())[:8]
+        new_track = {
+            'id': track_id,
+            'title': data.get('title', 'Untitled'),
+            'genre': data.get('genre', ''),
+            'duration': data.get('duration', ''),
+            'description': data.get('description', ''),
+            'audio_url': data.get('audio_url', ''),
+            'moods': data.get('moods', []),
+            'artist': data.get('artist', ''),
+            'artist_id': data.get('artist_id', ''),
+            'artist_email': data.get('artist_email', ''),
+            'price_short': data.get('price_short', 15),
+            'price_feature': data.get('price_feature', 50),
+            'price_commercial': data.get('price_commercial', 100),
+            'status': 'pending_review',
+            'licenses': 0,
+            'earnings': 0,
+            'created_at': datetime.now().isoformat()
+        }
+        
+        tracks.append(new_track)
+        save_music(tracks)
+        print(f"Music track uploaded: {track_id} - {new_track['title']}")
+        return jsonify({'success': True, 'track_id': track_id, 'message': 'Track submitted for review'})
+    except Exception as e:
+        print(f"Music upload error: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/music/license', methods=['POST'])
+def license_music():
+    data = request.json
+    track_id = data.get('track_id')
+    license_type = data.get('license_type', 'short')
+    price = data.get('price', 15)
+    email = data.get('email', '')
+    
+    if not stripe.api_key: return jsonify({'error': 'Payment not configured'}), 500
+    
+    tracks = load_music()
+    track = next((t for t in tracks if t['id'] == track_id), None)
+    if not track: return jsonify({'error': 'Track not found'}), 404
+    
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{'price_data': {'currency': 'gbp', 'unit_amount': int(price * 100),
+                'product_data': {'name': f"License: {track['title']}", 'description': f'{license_type.title()} film license'}}, 'quantity': 1}],
+            mode='payment', 
+            success_url=f"{request.host_url}music-browse?licensed=true&track={track_id}",
+            cancel_url=f"{request.host_url}music-license/{track_id}", 
+            customer_email=email,
+            metadata={'track_id': track_id, 'license_type': license_type, 'user_email': email, 'type': 'music_license', 'price': price, 'artist_email': track.get('artist_email', '')}
+        )
+        return jsonify({'sessionId': session.id, 'url': session.url})
+    except Exception as e: return jsonify({'error': str(e)}), 500
+
+# Admin music routes
+@app.route('/api/admin/music')
+def admin_music():
+    tracks = load_music()
+    return jsonify({'success': True, 'tracks': tracks, 'total': len(tracks)})
+
+@app.route('/api/admin/music/<track_id>/approve', methods=['POST'])
+def approve_music(track_id):
+    tracks = load_music()
+    for t in tracks:
+        if t['id'] == track_id:
+            t['status'] = 'approved'
+            save_music(tracks)
+            return jsonify({'success': True})
+    return jsonify({'success': False}), 404
 
 # ============================================
 # API ROUTES - PROFILES
