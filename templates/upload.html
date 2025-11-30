@@ -157,9 +157,28 @@
                     body: JSON.stringify(data)
                 });
                 const result = await res.json();
-                if (result.success) { alert('🎉 Film submitted! We will review it within 24-48 hours.'); window.location = '/dashboard'; }
-                else { alert(result.error || 'Error'); btn.disabled = false; btn.textContent = '📤 Submit Film for Review'; }
-            } catch(err) { alert('Error'); btn.disabled = false; btn.textContent = '📤 Submit Film for Review'; }
+                console.log('Upload result:', result);
+                if (result.success) {
+                    document.getElementById('main').innerHTML = `
+                        <div style="text-align:center;padding:60px;background:rgba(255,255,255,0.05);border-radius:20px;">
+                            <div style="font-size:4em;margin-bottom:20px;">🎉</div>
+                            <h2 style="color:#22c55e;margin-bottom:15px;">Film Submitted Successfully!</h2>
+                            <p style="color:rgba(255,255,255,0.7);margin-bottom:10px;">Your film "<strong>${data.title}</strong>" has been submitted for review.</p>
+                            <p style="color:rgba(255,255,255,0.5);margin-bottom:30px;">We'll review it within 24-48 hours and notify you when it's approved.</p>
+                            <div style="display:flex;gap:15px;justify-content:center;">
+                                <a href="/upload" style="background:rgba(168,85,247,0.2);color:#a855f7;padding:15px 30px;border-radius:25px;text-decoration:none;font-weight:600;">Upload Another</a>
+                                <a href="/dashboard" style="background:linear-gradient(135deg,#a855f7,#7c3aed);color:white;padding:15px 30px;border-radius:25px;text-decoration:none;font-weight:600;">Go to Dashboard</a>
+                            </div>
+                        </div>`;
+                } else {
+                    alert('Error: ' + (result.error || 'Failed to upload')); 
+                    btn.disabled = false; btn.textContent = '📤 Submit Film for Review';
+                }
+            } catch(err) {
+                console.error('Upload error:', err);
+                alert('Error: ' + err.message); 
+                btn.disabled = false; btn.textContent = '📤 Submit Film for Review';
+            }
         }
         
         init();
