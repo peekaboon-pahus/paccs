@@ -117,6 +117,9 @@ def spotlight_page(): return render_template('spotlight.html')
 @app.route('/admin')
 def admin_page(): return render_template('admin.html')
 
+@app.route('/admin-streaming')
+def admin_streaming_page(): return render_template('admin_streaming.html')
+
 @app.route('/pricing')
 def pricing_page(): return render_template('pricing.html')
 
