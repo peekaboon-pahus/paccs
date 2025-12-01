@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winners - PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+        
+        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5em; font-weight: bold; color: #fff; text-decoration: none; }
+        .logo span { color: #a855f7; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; padding: 8px 16px; border-radius: 20px; }
+        .nav-links a:hover { background: rgba(255,255,255,0.1); }
+        .nav-links a.primary { background: linear-gradient(135deg, #a855f7, #6366f1); }
+        
+        .hero { background: linear-gradient(135deg, #1a1a2e 0%, #2d1f3d 100%); padding: 80px 40px; text-align: center; }
+        .hero h1 { font-size: 3em; margin-bottom: 15px; }
+        .hero h1 span { color: #fbbf24; }
+        .hero p { color: rgba(255,255,255,0.7); font-size: 1.2em; max-width: 600px; margin: 0 auto; }
+        
+        .filters { max-width: 1200px; margin: 0 auto; padding: 40px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+        .filter-btn { padding: 10px 25px; border-radius: 25px; border: 2px solid rgba(255,255,255,0.2); background: transparent; color: white; cursor: pointer; font-size: 1em; transition: all 0.2s; }
+        .filter-btn:hover, .filter-btn.active { background: rgba(168,85,247,0.2); border-color: #a855f7; color: #a855f7; }
+        
+        .winners-section { max-width: 1200px; margin: 0 auto; padding: 0 40px 60px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .section-header h2 { font-size: 1.8em; display: flex; align-items: center; gap: 15px; }
+        .year-badge { background: rgba(168,85,247,0.2); color: #a855f7; padding: 5px 15px; border-radius: 15px; font-size: 0.6em; }
+        
+        .winners-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+        
+        .winner-card { background: rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s; }
+        .winner-card:hover { border-color: rgba(251,191,36,0.5); transform: translateY(-5px); }
+        .winner-card.gold { border-color: rgba(255,215,0,0.3); }
+        .winner-card.gold .award-badge { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+        
+        .winner-thumbnail { width: 100%; height: 200px; background: linear-gradient(135deg, #1a1a2e, #2d1f3d); display: flex; align-items: center; justify-content: center; position: relative; }
+        .winner-thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+        .winner-thumbnail .placeholder { font-size: 4em; opacity: 0.3; }
+        .award-badge { position: absolute; top: 15px; right: 15px; background: linear-gradient(135deg, #a855f7, #6366f1); color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+        .laurel { position: absolute; bottom: 15px; left: 15px; background: rgba(0,0,0,0.7); padding: 5px 12px; border-radius: 10px; font-size: 0.8em; display: flex; align-items: center; gap: 5px; }
+        
+        .winner-info { padding: 25px; }
+        .winner-info h3 { font-size: 1.3em; margin-bottom: 10px; }
+        .winner-meta { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
+        .meta-item { color: rgba(255,255,255,0.6); font-size: 0.9em; display: flex; align-items: center; gap: 5px; }
+        .winner-director { color: #a855f7; font-size: 0.95em; margin-bottom: 15px; }
+        .winner-category { display: inline-block; background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 12px; font-size: 0.85em; color: rgba(255,255,255,0.7); margin-bottom: 15px; }
+        
+        .winner-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-small { padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; font-weight: 600; font-size: 0.9em; text-decoration: none; text-align: center; transition: all 0.2s; }
+        .btn-watch { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; flex: 1; }
+        .btn-profile { background: rgba(255,255,255,0.1); color: white; }
+        
+        .empty-state { text-align: center; padding: 80px 40px; }
+        .empty-state .icon { font-size: 4em; margin-bottom: 20px; opacity: 0.5; }
+        .empty-state h3 { font-size: 1.5em; margin-bottom: 15px; }
+        .empty-state p { color: rgba(255,255,255,0.6); margin-bottom: 30px; }
+        .btn { display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #a855f7, #6366f1); color: white; border-radius: 25px; text-decoration: none; font-weight: 600; }
+        
+        .cta-section { background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(99,102,241,0.1)); border: 2px dashed rgba(168,85,247,0.5); border-radius: 25px; padding: 60px; text-align: center; margin: 60px auto; max-width: 800px; }
+        .cta-section h3 { font-size: 1.8em; margin-bottom: 15px; }
+        .cta-section p { color: rgba(255,255,255,0.7); margin-bottom: 30px; font-size: 1.1em; }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2em; }
+            .winners-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="/" class="logo">🎬 <span>PACCS</span></a>
+        <nav class="nav-links">
+            <a href="/festival">Festival</a>
+            <a href="/watch">Streaming</a>
+            <a href="/music-browse">Music</a>
+            <a href="https://filmfreeway.com/PeekaboonInternationalFilmFestival" target="_blank" class="primary">Submit Film →</a>
+        </nav>
+    </header>
+    
+    <section class="hero">
+        <h1>🏆 Festival <span>Winners</span></h1>
+        <p>Celebrating the best independent films. Every winner gets platform access to monetize their work.</p>
+    </section>
+    
+    <div class="filters">
+        <button class="filter-btn active" onclick="filterWinners('all')">All Winners</button>
+        <button class="filter-btn" onclick="filterWinners('ai')">🤖 AI & Innovation</button>
+        <button class="filter-btn" onclick="filterWinners('impact')">🌍 Social Impact</button>
+        <button class="filter-btn" onclick="filterWinners('emerging')">🌱 Emerging Voices</button>
+        <button class="filter-btn" onclick="filterWinners('excellence')">🎬 Cinema Excellence</button>
+    </div>
+    
+    <main class="winners-section" id="winnersSection">
+        <!-- Winners loaded dynamically -->
+    </main>
+    
+    <script>
+        var allWinners = [];
+        
+        function loadWinners() {
+            fetch('/api/winners')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    allWinners = data.winners || [];
+                    if (allWinners.length === 0) {
+                        showComingSoon();
+                    } else {
+                        renderWinners(allWinners);
+                    }
+                })
+                .catch(function(e) {
+                    console.error(e);
+                    showComingSoon();
+                });
+        }
+        
+        function showComingSoon() {
+            document.getElementById('winnersSection').innerHTML = 
+                '<div class="empty-state">' +
+                '<div class="icon">🏆</div>' +
+                '<h3>Winners Announced August 2026</h3>' +
+                '<p>The first PIFF winners will be announced at our London premiere. Submit your film now to be part of the inaugural edition.</p>' +
+                '<a href="https://filmfreeway.com/PeekaboonInternationalFilmFestival" target="_blank" class="btn">Submit on FilmFreeway →</a>' +
+                '</div>' +
+                '<div class="cta-section">' +
+                '<h3>🎬 Can\'t Wait? Start Streaming Now</h3>' +
+                '<p>You don\'t need to win to monetize your film. Upload to our streaming platform and start earning today.</p>' +
+                '<a href="/upload" class="btn">Upload Your Film →</a>' +
+                '</div>';
+        }
+        
+        function renderWinners(winners) {
+            var grouped = {};
+            winners.forEach(function(w) {
+                var year = w.year || '2026';
+                if (!grouped[year]) grouped[year] = [];
+                grouped[year].push(w);
+            });
+            
+            var html = '';
+            Object.keys(grouped).sort().reverse().forEach(function(year) {
+                html += '<div class="section-header"><h2>PIFF ' + year + ' <span class="year-badge">Winners</span></h2></div>';
+                html += '<div class="winners-grid">';
+                
+                grouped[year].forEach(function(w) {
+                    var tierClass = w.tier === 'gold' ? 'gold' : '';
+                    var tierLabel = w.tier === 'gold' ? '🥇 Grand Prize' : w.tier === 'silver' ? '🥈 Winner' : '🥉 Selected';
+                    
+                    html += '<div class="winner-card ' + tierClass + '">';
+                    html += '<div class="winner-thumbnail">';
+                    if (w.thumbnail) {
+                        html += '<img src="' + w.thumbnail + '" alt="' + w.title + '">';
+                    } else {
+                        html += '<span class="placeholder">🎬</span>';
+                    }
+                    html += '<span class="award-badge">' + tierLabel + '</span>';
+                    html += '<span class="laurel">🌿 Official Selection</span>';
+                    html += '</div>';
+                    html += '<div class="winner-info">';
+                    html += '<h3>' + w.title + '</h3>';
+                    html += '<div class="winner-director">Directed by ' + (w.director || 'Unknown') + '</div>';
+                    html += '<span class="winner-category">' + getCategoryIcon(w.category) + ' ' + (w.category || 'Cinema Excellence') + '</span>';
+                    html += '<div class="winner-meta">';
+                    if (w.country) html += '<span class="meta-item">🌍 ' + w.country + '</span>';
+                    if (w.duration) html += '<span class="meta-item">⏱ ' + w.duration + '</span>';
+                    if (w.year) html += '<span class="meta-item">📅 ' + w.year + '</span>';
+                    html += '</div>';
+                    html += '<div class="winner-actions">';
+                    if (w.streaming_id) {
+                        html += '<a href="/watch/' + w.streaming_id + '" class="btn-small btn-watch">▶ Watch Now</a>';
+                    }
+                    if (w.filmmaker_id) {
+                        html += '<a href="/filmmaker/' + w.filmmaker_id + '" class="btn-small btn-profile">👤 Profile</a>';
+                    }
+                    html += '</div></div></div>';
+                });
+                
+                html += '</div>';
+            });
+            
+            html += '<div class="cta-section">' +
+                '<h3>🎬 Want to Join Them?</h3>' +
+                '<p>Submit your film to PIFF 2026 and compete for platform access, London screenings, and global distribution.</p>' +
+                '<a href="https://filmfreeway.com/PeekaboonInternationalFilmFestival" target="_blank" class="btn">Submit on FilmFreeway →</a>' +
+                '</div>';
+            
+            document.getElementById('winnersSection').innerHTML = html;
+        }
+        
+        function getCategoryIcon(category) {
+            var icons = {
+                'AI & Innovation': '🤖',
+                'Social Impact': '🌍',
+                'Emerging Voices': '🌱',
+                'Cinema Excellence': '🎬'
+            };
+            return icons[category] || '🎬';
+        }
+        
+        function filterWinners(category) {
+            document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+            event.target.classList.add('active');
+            
+            if (category === 'all') {
+                renderWinners(allWinners);
+                return;
+            }
+            
+            var categoryMap = {
+                'ai': 'AI & Innovation',
+                'impact': 'Social Impact',
+                'emerging': 'Emerging Voices',
+                'excellence': 'Cinema Excellence'
+            };
+            
+            var filtered = allWinners.filter(function(w) {
+                return w.category === categoryMap[category];
+            });
+            
+            if (filtered.length === 0) {
+                document.getElementById('winnersSection').innerHTML = 
+                    '<div class="empty-state">' +
+                    '<div class="icon">' + getCategoryIcon(categoryMap[category]) + '</div>' +
+                    '<h3>No Winners Yet in ' + categoryMap[category] + '</h3>' +
+                    '<p>Be the first! Submit your film to this category.</p>' +
+                    '<a href="https://filmfreeway.com/PeekaboonInternationalFilmFestival" target="_blank" class="btn">Submit Film →</a>' +
+                    '</div>';
+            } else {
+                renderWinners(filtered);
+            }
+        }
+        
+        loadWinners();
+    </script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIFF 2026 - Peekaboon International Film Festival</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #fff; }
+        
+        /* Hero Section */
+        .hero { min-height: 100vh; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: flex; flex-direction: column; }
+        .nav { padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5em; font-weight: bold; color: #fff; text-decoration: none; }
+        .logo span { color: #a855f7; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; padding: 10px 20px; border-radius: 25px; transition: all 0.2s; }
+        .nav-links a:hover { background: rgba(255,255,255,0.1); }
+        .nav-links a.primary { background: linear-gradient(135deg, #a855f7, #6366f1); color: white; }
+        
+        .hero-content { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px; }
+        .badge { background: rgba(168,85,247,0.2); color: #a855f7; padding: 8px 20px; border-radius: 20px; font-size: 0.9em; margin-bottom: 20px; display: inline-block; }
+        .hero h1 { font-size: 4em; margin-bottom: 20px; line-height: 1.1; }
+        .hero h1 span { background: linear-gradient(135deg, #a855f7, #22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.3em; color: rgba(255,255,255,0.7); max-width: 700px; margin-bottom: 40px; line-height: 1.6; }
+        .hero-buttons { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .btn { padding: 18px 40px; border-radius: 30px; text-decoration: none; font-weight: 600; font-size: 1.1em; transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px; }
+        .btn-primary { background: linear-gradient(135deg, #a855f7, #6366f1); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(168,85,247,0.4); }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: white; border: 2px solid rgba(255,255,255,0.2); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.2); }
+        
+        .hero-stats { display: flex; gap: 60px; margin-top: 60px; }
+        .stat { text-align: center; }
+        .stat-num { font-size: 2.5em; font-weight: bold; color: #22c55e; }
+        .stat-label { color: rgba(255,255,255,0.6); font-size: 0.9em; margin-top: 5px; }
+        
+        /* Credentials */
+        .credentials { background: rgba(255,255,255,0.02); padding: 60px 40px; }
+        .credentials-inner { max-width: 1000px; margin: 0 auto; text-align: center; }
+        .credentials h2 { font-size: 1.8em; margin-bottom: 40px; }
+        .credential-logos { display: flex; justify-content: center; gap: 50px; flex-wrap: wrap; align-items: center; }
+        .credential { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .credential-icon { font-size: 2.5em; }
+        .credential-text { color: rgba(255,255,255,0.7); font-size: 0.9em; }
+        .credential-text a { color: #a855f7; text-decoration: none; }
+        
+        /* Categories */
+        .categories { padding: 100px 40px; }
+        .categories-inner { max-width: 1200px; margin: 0 auto; }
+        .section-title { text-align: center; font-size: 2.5em; margin-bottom: 20px; }
+        .section-subtitle { text-align: center; color: rgba(255,255,255,0.6); margin-bottom: 60px; font-size: 1.1em; }
+        .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
+        .category-card { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 35px; text-align: center; border: 2px solid rgba(255,255,255,0.1); transition: all 0.3s; }
+        .category-card:hover { border-color: rgba(168,85,247,0.5); transform: translateY(-5px); }
+        .category-icon { font-size: 3em; margin-bottom: 20px; }
+        .category-card h3 { font-size: 1.3em; margin-bottom: 10px; }
+        .category-card p { color: rgba(255,255,255,0.6); font-size: 0.9em; line-height: 1.5; }
+        
+        /* Platform Features */
+        .features { background: linear-gradient(135deg, #1a1a2e 0%, #2d1f3d 100%); padding: 100px 40px; }
+        .features-inner { max-width: 1200px; margin: 0 auto; }
+        .features .section-title span { color: #22c55e; }
+        .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 60px; }
+        .feature-card { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); }
+        .feature-card:hover { border-color: rgba(34,197,94,0.5); }
+        .feature-icon { font-size: 2.5em; margin-bottom: 20px; }
+        .feature-card h3 { font-size: 1.4em; margin-bottom: 15px; }
+        .feature-card p { color: rgba(255,255,255,0.6); line-height: 1.6; margin-bottom: 20px; }
+        .feature-link { color: #22c55e; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+        .feature-link:hover { text-decoration: underline; }
+        
+        /* Prizes */
+        .prizes { padding: 100px 40px; }
+        .prizes-inner { max-width: 1000px; margin: 0 auto; }
+        .prize-tiers { display: flex; flex-direction: column; gap: 30px; margin-top: 60px; }
+        .prize-tier { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 40px; display: grid; grid-template-columns: 150px 1fr; gap: 40px; align-items: center; border: 2px solid rgba(255,255,255,0.1); }
+        .prize-tier.gold { border-color: rgba(255,215,0,0.5); background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.02)); }
+        .prize-tier.silver { border-color: rgba(192,192,192,0.5); }
+        .prize-tier.bronze { border-color: rgba(205,127,50,0.5); }
+        .tier-badge { text-align: center; }
+        .tier-icon { font-size: 4em; }
+        .tier-name { font-size: 1.2em; font-weight: bold; margin-top: 10px; }
+        .tier-benefits ul { list-style: none; }
+        .tier-benefits li { padding: 8px 0; padding-left: 30px; position: relative; color: rgba(255,255,255,0.8); }
+        .tier-benefits li::before { content: "✓"; position: absolute; left: 0; color: #22c55e; font-weight: bold; }
+        
+        /* CTA */
+        .cta { background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); padding: 100px 40px; text-align: center; }
+        .cta h2 { font-size: 3em; margin-bottom: 20px; }
+        .cta p { font-size: 1.3em; opacity: 0.9; margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .cta .btn { background: white; color: #6366f1; }
+        .cta .btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+        
+        /* Deadlines */
+        .deadlines { background: rgba(255,255,255,0.02); padding: 60px 40px; }
+        .deadlines-inner { max-width: 800px; margin: 0 auto; text-align: center; }
+        .deadline-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 40px; }
+        .deadline-card { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 30px; }
+        .deadline-type { color: rgba(255,255,255,0.6); font-size: 0.9em; margin-bottom: 10px; }
+        .deadline-date { font-size: 1.5em; font-weight: bold; color: #a855f7; }
+        
+        /* Footer */
+        .footer { padding: 60px 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); }
+        .footer-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; flex-wrap: wrap; }
+        .footer-links a { color: rgba(255,255,255,0.6); text-decoration: none; }
+        .footer-links a:hover { color: #a855f7; }
+        .footer-copy { color: rgba(255,255,255,0.4); font-size: 0.9em; }
+        
+        @media (max-width: 900px) {
+            .hero h1 { font-size: 2.5em; }
+            .category-grid { grid-template-columns: repeat(2, 1fr); }
+            .feature-grid { grid-template-columns: 1fr; }
+            .prize-tier { grid-template-columns: 1fr; text-align: center; }
+            .hero-stats { flex-direction: column; gap: 30px; }
+            .deadline-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <nav class="nav">
+            <a href="/" class="logo">🎬 <span>PACCS</span></a>
+            <div class="nav-links">
+                <a href="/watch">Streaming</a>
+                <a href="/music-browse">Music</a>
+                <a href="/filmmakers">Filmmakers</a>
+                <a href="https://filmfreeway.com/PeekaboonInternationalFilmFestival" target="_blank" class="primary">Submit on FilmFreeway →</a>
+            </div>
+        </nav>
+        
+        <div class="hero-content">
+            <span class="badge">🎬 AUGUST 2026 • LONDON</span>
+            <h1>Peekaboon International<br><span>Film Festival</span></h1>
+            <p>The only festival where every film finds its future. Not just laurels — real revenue, real distribution, real ownership. Backed by Oxford, UCL & Innovate UK.</p>
+            
+            <div class="hero-buttons">
+                <a href="https://filmfreeway.com/PeekaboonInternationalFilmFestival" target="_blank" class="btn btn-primary">🎬 Submit on FilmFreeway</a>
+                <a href="#features" class="btn btn-secondary">Explore Platform ↓</a>
+            </div>
+            
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-num">4,700+</div>
+                    <div class="stat-label">Films Analyzed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">70%</div>
+                    <div class="stat-label">Revenue to Filmmakers</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">£50K</div>
+                    <div class="stat-label">Innovate UK Funded</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="credentials">
+        <div class="credentials-inner">
+            <h2>Backed by World-Class Institutions</h2>
+            <div class="credential-logos">
+                <div class="credential">
+                    <div class="credential-icon">🎓</div>
+                    <div class="credential-text">Founded at<br><a href="https://en.wikipedia.org/wiki/Public_Health_Film_Society" target="_blank">University of Oxford</a></div>
+                </div>
+                <div class="credential">
+                    <div class="credential-icon">🏛️</div>
+                    <div class="credential-text">Powered by<br><a href="https://www.ucl.ac.uk/arts-humanities/case-studies/2022/sep/public-arts-health-us" target="_blank">UCL Innovation</a></div>
+                </div>
+                <div class="credential">
+                    <div class="credential-icon">🇬🇧</div>
+                    <div class="credential-text">Funded by<br><a href="https://gtr.ukri.org/projects?ref=10115079" target="_blank">Innovate UK</a></div>
+                </div>
+                <div class="credential">
+                    <div class="credential-icon">🤖</div>
+                    <div class="credential-text">Integrated with<br><a href="https://paccs.peekaboon.com">PACCS AI Platform</a></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="categories">
+        <div class="categories-inner">
+            <h2 class="section-title">Competition Categories</h2>
+            <p class="section-subtitle">Four pathways to recognition</p>
+            
+            <div class="category-grid">
+                <div class="category-card">
+                    <div class="category-icon">🤖</div>
+                    <h3>AI & Innovation</h3>
+                    <p>Films exploring artificial intelligence, emerging tech, or innovative filmmaking techniques</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">🌍</div>
+                    <h3>Social Impact</h3>
+                    <p>Health, Climate, Education, SDGs, Human Rights — films that move the needle</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">🌱</div>
+                    <h3>Emerging Voices</h3>
+                    <p>Students, first-time filmmakers, underrepresented creators — your breakthrough</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">🎬</div>
+                    <h3>Cinema Excellence</h3>
+                    <p>Drama, Documentary, Comedy, Thriller, Experimental, Animation, Horror</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="features" id="features">
+        <div class="features-inner">
+            <h2 class="section-title">More Than a Festival — <span>A Platform</span></h2>
+            <p class="section-subtitle">While you're here, discover what else PACCS offers filmmakers</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI Film Analysis</h3>
+                    <p>Get instant insights on your film's market potential, festival fit, distribution pathways, and advertiser compatibility.</p>
+                    <a href="/dashboard" class="feature-link">Analyze Your Film →</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📺</div>
+                    <h3>Streaming Platform</h3>
+                    <p>Upload your film, set your price, keep 70% of revenue. Your own streaming page — free or pay-per-view.</p>
+                    <a href="/upload" class="feature-link">Upload Your Film →</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎵</div>
+                    <h3>Music Marketplace</h3>
+                    <p>License indie music for your next project. Artists earn 70%. No subscriptions — pay per track.</p>
+                    <a href="/music-browse" class="feature-link">Browse Music →</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👤</div>
+                    <h3>Filmmaker Directory</h3>
+                    <p>Create your profile, showcase your work, get discovered by collaborators and buyers worldwide.</p>
+                    <a href="/filmmakers" class="feature-link">View Directory →</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>PACCS Scoring</h3>
+                    <p>Every submission can receive AI-powered feedback on artistic merit, market potential, and distribution strategy.</p>
+                    <a href="/dashboard" class="feature-link">Learn More →</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3>Winner Showcase</h3>
+                    <p>Past winners featured permanently on platform. Direct pathway from laurel to distribution.</p>
+                    <a href="/winners" class="feature-link">View Winners →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="prizes">
+        <div class="prizes-inner">
+            <h2 class="section-title">Winner Benefits</h2>
+            <p class="section-subtitle">Beyond laurels — real value for your career</p>
+            
+            <div class="prize-tiers">
+                <div class="prize-tier gold">
+                    <div class="tier-badge">
+                        <div class="tier-icon">🥇</div>
+                        <div class="tier-name">Top 5 Winners</div>
+                    </div>
+                    <div class="tier-benefits">
+                        <ul>
+                            <li>London Cinema Premiere screening</li>
+                            <li>Revenue-share ticketed screenings</li>
+                            <li>3-Year Founding Member Platform Access</li>
+                            <li>Full PACCS AI Analysis report</li>
+                            <li>Personal streaming page (keep 70%)</li>
+                            <li>Featured in Winner Showcase</li>
+                            <li>Music Marketplace access</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="prize-tier silver">
+                    <div class="tier-badge">
+                        <div class="tier-icon">🥈</div>
+                        <div class="tier-name">Top 50 Winners</div>
+                    </div>
+                    <div class="tier-benefits">
+                        <ul>
+                            <li>2-Year Founding Member Platform Access</li>
+                            <li>Featured placement on platform</li>
+                            <li>Filmmaker directory spotlight</li>
+                            <li>Priority onboarding support</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="prize-tier bronze">
+                    <div class="tier-badge">
+                        <div class="tier-icon">🥉</div>
+                        <div class="tier-name">Top 250 Winners</div>
+                    </div>
+                    <div class="tier-benefits">
+                        <ul>
+                            <li>1-Year Founding Member Platform Access</li>
+                            <li>Platform profile page</li>
+                            <li>Networking access</li>
+                            <li>Early adopter status</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="deadlines">
+        <div class="deadlines-inner">
+            <h2 class="section-title">Submission Deadlines</h2>
+            <div class="deadline-grid">
+                <div class="deadline-card">
+                    <div class="deadline-type">Early Bird</div>
+                    <div class="deadline-date">March 2026</div>
+                </div>
+                <div class="deadline-card">
+                    <div class="deadline-type">Regular</div>
+                    <div class="deadline-date">May 2026</div>
+                </div>
+                <div class="deadline-card">
+                    <div class="deadline-type">Late</div>
+                    <div class="deadline-date">June 2026</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="cta">
+        <h2>Your Film Deserves More Than a Laurel</h2>
+        <p>Join the founding filmmakers. Get in early before the platform goes public.</p>
+        <a href="https://filmfreeway.com/PeekaboonInternationalFilmFestival" target="_blank" class="btn">🎬 Submit on FilmFreeway</a>
+    </section>
+    
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/">Home</a>
+            <a href="/watch">Streaming</a>
+            <a href="/music-browse">Music</a>
+            <a href="/filmmakers">Filmmakers</a>
+            <a href="/winners">Winners</a>
+            <a href="mailto:peekaboon@pahus.org">Contact</a>
+        </div>
+        <p class="footer-copy">© 2025 PAHUS CIC. All rights reserved. Platform in curated soft launch.</p>
+    </footer>
+</body>
+</html>

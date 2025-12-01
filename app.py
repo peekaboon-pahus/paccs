@@ -167,6 +167,19 @@ def music_license(track_id): return render_template('music_license.html', track_
 @app.route('/admin-music')
 def admin_music_page(): return render_template('admin_music.html')
 
+# Festival & Competition Pages
+@app.route('/festival')
+def festival_page(): return render_template('festival.html')
+
+@app.route('/piff')
+def piff_redirect(): return redirect('/festival')
+
+@app.route('/winners')
+def winners_page(): return render_template('winners.html')
+
+@app.route('/admin-judging')
+def admin_judging_page(): return render_template('admin_judging.html')
+
 # ============================================
 # API ROUTES - FILMS & ANALYSIS
 # ============================================
@@ -548,8 +561,172 @@ def approve_music(track_id):
     return jsonify({'success': False}), 404
 
 # ============================================
-# API ROUTES - PROFILES
+# API ROUTES - FESTIVAL ENTRIES & WINNERS
 # ============================================
+
+def load_entries(): return load_json('paccs_entries.json', [])
+def save_entries(entries): save_json('paccs_entries.json', entries)
+def load_winners(): return load_json('paccs_winners.json', [])
+def save_winners(winners): save_json('paccs_winners.json', winners)
+
+@app.route('/api/winners')
+def get_winners():
+    winners = load_winners()
+    return jsonify({'success': True, 'winners': winners, 'total': len(winners)})
+
+@app.route('/api/admin/entries')
+def admin_get_entries():
+    entries = load_entries()
+    return jsonify({'success': True, 'entries': entries, 'total': len(entries)})
+
+@app.route('/api/admin/entries/add', methods=['POST'])
+def admin_add_entry():
+    try:
+        data = request.json
+        entries = load_entries()
+        
+        entry_id = str(uuid.uuid4())[:8]
+        new_entry = {
+            'id': entry_id,
+            'title': data.get('title', 'Untitled'),
+            'director': data.get('director', ''),
+            'country': data.get('country', ''),
+            'duration': data.get('duration', ''),
+            'category': data.get('category', 'Cinema Excellence'),
+            'video_url': data.get('video_url', ''),
+            'thumbnail': data.get('thumbnail', ''),
+            'filmmaker_email': data.get('filmmaker_email', ''),
+            'filmmaker_id': data.get('filmmaker_id', ''),
+            'status': 'pending',
+            'paccs_score': None,
+            'score_artistic': None,
+            'score_market': None,
+            'score_technical': None,
+            'score_impact': None,
+            'judge_notes': '',
+            'streaming_id': None,
+            'created_at': datetime.now().isoformat()
+        }
+        
+        entries.append(new_entry)
+        save_entries(entries)
+        return jsonify({'success': True, 'entry_id': entry_id})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/admin/entries/<entry_id>/score', methods=['POST'])
+def score_entry(entry_id):
+    try:
+        data = request.json
+        entries = load_entries()
+        
+        for e in entries:
+            if e['id'] == entry_id:
+                e['score_artistic'] = data.get('score_artistic')
+                e['score_market'] = data.get('score_market')
+                e['score_technical'] = data.get('score_technical')
+                e['score_impact'] = data.get('score_impact')
+                e['judge_notes'] = data.get('judge_notes', '')
+                e['status'] = data.get('status', 'reviewed')
+                
+                # Calculate average PACCS score
+                scores = [e['score_artistic'], e['score_market'], e['score_technical'], e['score_impact']]
+                e['paccs_score'] = round(sum(s for s in scores if s) / len([s for s in scores if s]))
+                
+                save_entries(entries)
+                return jsonify({'success': True})
+        
+        return jsonify({'success': False, 'error': 'Entry not found'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/admin/entries/<entry_id>/winner', methods=['POST'])
+def make_winner(entry_id):
+    try:
+        entries = load_entries()
+        winners = load_winners()
+        
+        for e in entries:
+            if e['id'] == entry_id:
+                e['status'] = 'winner'
+                save_entries(entries)
+                
+                # Add to winners list
+                winner = {
+                    'id': e['id'],
+                    'title': e['title'],
+                    'director': e['director'],
+                    'country': e['country'],
+                    'duration': e['duration'],
+                    'category': e['category'],
+                    'thumbnail': e['thumbnail'],
+                    'streaming_id': e.get('streaming_id'),
+                    'filmmaker_id': e.get('filmmaker_id'),
+                    'tier': 'gold',
+                    'year': '2026',
+                    'awarded_at': datetime.now().isoformat()
+                }
+                winners.append(winner)
+                save_winners(winners)
+                
+                return jsonify({'success': True})
+        
+        return jsonify({'success': False, 'error': 'Entry not found'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/admin/entries/<entry_id>/onboard', methods=['POST'])
+def onboard_to_streaming(entry_id):
+    try:
+        entries = load_entries()
+        films = load_streaming_films()
+        
+        for e in entries:
+            if e['id'] == entry_id:
+                # Create streaming film from entry
+                film_id = str(uuid.uuid4())[:8]
+                new_film = {
+                    'id': film_id,
+                    'title': e['title'],
+                    'genre': e['category'],
+                    'duration': e['duration'],
+                    'year': '2026',
+                    'country': e['country'],
+                    'description': f"PIFF 2026 {e['status'].title()} - {e['category']}",
+                    'video_url': e.get('video_url', ''),
+                    'thumbnail': e.get('thumbnail', ''),
+                    'tags': ['PIFF 2026', e['category']],
+                    'filmmaker': e['director'],
+                    'filmmaker_email': e.get('filmmaker_email', ''),
+                    'filmmaker_id': e.get('filmmaker_id', ''),
+                    'price': 5,
+                    'status': 'approved',
+                    'featured': e['status'] == 'winner',
+                    'views': 0,
+                    'rentals': 0,
+                    'earnings': 0,
+                    'created_at': datetime.now().isoformat()
+                }
+                
+                films.append(new_film)
+                save_streaming_films(films)
+                
+                # Update entry with streaming ID
+                e['streaming_id'] = film_id
+                save_entries(entries)
+                
+                # Update winner if exists
+                winners = load_winners()
+                for w in winners:
+                    if w['id'] == entry_id:
+                        w['streaming_id'] = film_id
+                save_winners(winners)
+                
+                return jsonify({'success': True, 'streaming_id': film_id})
+        
+        return jsonify({'success': False, 'error': 'Entry not found'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/profile/<profile_id>')
 def get_profile(profile_id):
