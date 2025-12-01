@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - PACCS</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -226,6 +227,12 @@
 <body>
     <header class="header">
         <div class="logo">🎬 <span>PACCS</span></div>
+        <nav style="display:flex; gap:15px;">
+            <a href="/festival" style="color:white; text-decoration:none; padding:8px 12px; border-radius:20px; opacity:0.8;">Festival</a>
+            <a href="/watch" style="color:white; text-decoration:none; padding:8px 12px; border-radius:20px; opacity:0.8;">Streaming</a>
+            <a href="/music-browse" style="color:white; text-decoration:none; padding:8px 12px; border-radius:20px; opacity:0.8;">Music</a>
+            <a href="/filmmakers" style="color:white; text-decoration:none; padding:8px 12px; border-radius:20px; opacity:0.8;">Filmmakers</a>
+        </nav>
         <div class="user-info">
             <span class="user-name" id="userName">Loading...</span>
             <span class="credits-badge" id="creditsDisplay">0 Credits</span>
@@ -283,18 +290,23 @@
         <section class="recent-section">
             <h2>Your Recent Analyses</h2>
             <ul class="recent-list" id="recentList">
+                <!-- Populated by JavaScript -->
             </ul>
         </section>
     </main>
     
     <script>
+        // Check login status
         const user = JSON.parse(localStorage.getItem('paccs_user') || 'null');
         
         if (!user) {
             window.location.href = '/login';
         } else {
+            // Update UI with user info
             document.getElementById('userName').textContent = user.name || user.email;
             document.getElementById('welcomeMessage').textContent = `Welcome back, ${user.name || 'Filmmaker'}! 👋`;
+            
+            // Load user stats
             loadUserStats();
         }
         
@@ -307,9 +319,11 @@
                 });
                 const data = await response.json();
                 
+                // Update stats - FIX: Only show average if films analyzed > 0
                 const filmsCount = data.films_analyzed || 0;
                 document.getElementById('filmsAnalyzed').textContent = filmsCount;
                 
+                // Only show average score if user has analyzed films
                 if (filmsCount > 0 && data.avg_score) {
                     document.getElementById('avgScore').textContent = data.avg_score.toFixed(1);
                 } else {
@@ -320,10 +334,12 @@
                 document.getElementById('creditsLeft').textContent = data.credits || 0;
                 document.getElementById('creditsDisplay').textContent = `${data.credits || 0} Credits`;
                 
+                // Load recent analyses
                 loadRecentAnalyses(data.recent || []);
                 
             } catch (error) {
                 console.error('Error loading stats:', error);
+                // Set defaults on error
                 document.getElementById('avgScore').textContent = '-';
             }
         }

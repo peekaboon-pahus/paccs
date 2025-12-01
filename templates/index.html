@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PACCS - AI Film Intelligence Platform</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
             min-height: 100vh;
             color: #fff;
@@ -24,10 +30,21 @@
             z-index: 100;
         }
         
-        .logo { font-size: 1.8em; font-weight: bold; }
-        .logo span { color: #48bb78; }
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
         
-        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .logo span {
+            color: #48bb78;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
         .nav-links a {
             color: white;
             text-decoration: none;
@@ -35,28 +52,54 @@
             border-radius: 20px;
             transition: all 0.2s;
         }
-        .nav-links a:hover { background: rgba(255,255,255,0.1); }
-        .nav-links .btn-dashboard { background: #48bb78; font-weight: 500; }
-        .nav-links .btn-dashboard:hover { background: #38a169; }
         
-        .stats-bar { display: flex; gap: 30px; font-size: 0.9em; }
-        .stat { text-align: center; }
-        .stat-value { font-size: 1.4em; font-weight: bold; color: #48bb78; }
-        
-        .main-content { padding: 30px 40px; max-width: 1400px; margin: 0 auto; }
-        .page-title { margin-bottom: 25px; }
-        .page-title h1 { font-size: 1.8em; margin-bottom: 5px; }
-        .page-title p { color: rgba(255,255,255,0.7); }
-        
-        .search-bar { display: flex; gap: 15px; margin-bottom: 20px; }
-        .search-bar input {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 25px;
-            font-size: 1em;
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.1);
         }
-        .search-bar input:focus { outline: 2px solid #48bb78; }
+        
+        .nav-links .btn-dashboard {
+            background: #48bb78;
+            font-weight: 500;
+        }
+        
+        .nav-links .btn-dashboard:hover {
+            background: #38a169;
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            font-size: 0.9em;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #48bb78;
+        }
+        
+        .main-content {
+            padding: 30px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .page-title {
+            margin-bottom: 25px;
+        }
+        
+        .page-title h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+        
+        .page-title p {
+            color: rgba(255,255,255,0.7);
+        }
         
         .films-grid {
             display: grid;
@@ -70,6 +113,7 @@
             border-radius: 12px;
             padding: 20px;
             color: #1a365d;
+            position: relative;
             display: flex;
             flex-direction: column;
             min-height: 200px;
@@ -79,16 +123,29 @@
             font-size: 1.1em;
             font-weight: bold;
             margin-bottom: 8px;
+            color: #1a365d;
             line-height: 1.3;
+            /* Limit to 2 lines */
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
         
-        .film-meta { color: #718096; font-size: 0.85em; margin-bottom: 12px; }
+        .film-meta {
+            color: #718096;
+            font-size: 0.85em;
+            margin-bottom: 12px;
+        }
         
-        .film-genres { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; flex-grow: 1; }
+        .film-genres {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        
         .genre-tag {
             background: #e2e8f0;
             color: #4a5568;
@@ -112,17 +169,26 @@
             width: fit-content;
             margin-top: auto;
         }
-        .btn-analyze:hover { background: #2d4a7c; transform: translateY(-2px); }
         
+        .btn-analyze:hover {
+            background: #2d4a7c;
+            transform: translateY(-2px);
+        }
+        
+        /* Analysis Result Overlay */
         .analysis-overlay {
             display: none;
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: rgba(0,0,0,0.8);
             z-index: 1000;
             overflow-y: auto;
             padding: 20px;
         }
+        
         .analysis-overlay.active {
             display: flex;
             justify-content: center;
@@ -135,6 +201,7 @@
             max-width: 700px;
             width: 100%;
             margin: 20px auto;
+            position: relative;
             color: #1a365d;
         }
         
@@ -148,22 +215,37 @@
         
         .close-btn {
             position: absolute;
-            top: 15px; right: 15px;
+            top: 15px;
+            right: 15px;
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
-            width: 36px; height: 36px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             font-size: 1.5em;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
         }
-        .close-btn:hover { background: rgba(255,255,255,0.3); }
         
-        .analysis-title { font-size: 1.4em; margin-bottom: 5px; padding-right: 40px; }
-        .analysis-meta { opacity: 0.8; font-size: 0.9em; }
+        .close-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        
+        .analysis-title {
+            font-size: 1.4em;
+            margin-bottom: 5px;
+            padding-right: 40px;
+        }
+        
+        .analysis-meta {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
         
         .score-section {
             display: flex;
@@ -173,8 +255,13 @@
             border-bottom: 1px solid #e2e8f0;
         }
         
+        .main-score {
+            text-align: center;
+        }
+        
         .score-circle {
-            width: 100px; height: 100px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             background: linear-gradient(135deg, #48bb78, #38a169);
             display: flex;
@@ -203,11 +290,26 @@
             flex-grow: 1;
         }
         
-        .prediction-item { text-align: center; }
-        .prediction-value { font-size: 1.8em; font-weight: bold; color: #48bb78; }
-        .prediction-label { font-size: 0.8em; color: #718096; }
+        .prediction-item {
+            text-align: center;
+        }
         
-        .tabs { display: flex; border-bottom: 1px solid #e2e8f0; }
+        .prediction-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #48bb78;
+        }
+        
+        .prediction-label {
+            font-size: 0.8em;
+            color: #718096;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
         .tab {
             flex: 1;
             padding: 15px;
@@ -217,14 +319,36 @@
             background: none;
             font-size: 0.9em;
             color: #718096;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .tab:hover { background: #f7fafc; }
-        .tab.active { color: #1a365d; font-weight: 600; border-bottom: 3px solid #48bb78; }
         
-        .tab-content { padding: 20px; display: none; }
-        .tab-content.active { display: block; }
+        .tab:hover {
+            background: #f7fafc;
+        }
         
-        .match-list { list-style: none; }
+        .tab.active {
+            color: #1a365d;
+            font-weight: 600;
+            border-bottom: 3px solid #48bb78;
+        }
+        
+        .tab-content {
+            padding: 20px;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .match-list {
+            list-style: none;
+        }
+        
         .match-item {
             display: flex;
             justify-content: space-between;
@@ -232,8 +356,15 @@
             padding: 12px 0;
             border-bottom: 1px solid #f0f0f0;
         }
-        .match-item:last-child { border-bottom: none; }
-        .match-name { font-weight: 500; }
+        
+        .match-item:last-child {
+            border-bottom: none;
+        }
+        
+        .match-name {
+            font-weight: 500;
+        }
+        
         .match-score {
             background: #e2e8f0;
             padding: 4px 12px;
@@ -241,7 +372,11 @@
             font-size: 0.85em;
             font-weight: 600;
         }
-        .match-score.high { background: #c6f6d5; color: #276749; }
+        
+        .match-score.high {
+            background: #c6f6d5;
+            color: #276749;
+        }
         
         .analysis-footer {
             padding: 20px;
@@ -259,8 +394,14 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .btn-report:hover { background: #38a169; }
+        
+        .btn-report:hover {
+            background: #38a169;
+        }
         
         .btn-close-bottom {
             background: #e2e8f0;
@@ -272,16 +413,60 @@
             font-weight: 500;
         }
         
-        .loading { text-align: center; padding: 60px; color: rgba(255,255,255,0.7); }
+        .btn-close-bottom:hover {
+            background: #cbd5e0;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: rgba(255,255,255,0.7);
+        }
+        
         .loading-spinner {
-            width: 50px; height: 50px;
+            width: 50px;
+            height: 50px;
             border: 4px solid rgba(255,255,255,0.2);
             border-top-color: #48bb78;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+        }
+        
+        .search-bar input:focus {
+            outline: 2px solid #48bb78;
+        }
+        
+        .filter-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+        
+        .filter-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
     </style>
 </head>
 <body>
@@ -298,8 +483,10 @@
             </div>
         </div>
         <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/music">Music Tool</a>
+            <a href="/festival">🎬 Festival</a>
+            <a href="/watch">📺 Streaming</a>
+            <a href="/music-browse">🎵 Music</a>
+            <a href="/filmmakers">👤 Filmmakers</a>
             <a href="/dashboard" class="btn-dashboard">Dashboard</a>
         </div>
     </div>
@@ -312,6 +499,7 @@
         
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="Search films by title, country, or genre..." onkeyup="filterFilms()">
+            <button class="filter-btn" onclick="toggleFilters()">⚙️ Filters</button>
         </div>
         
         <div class="films-grid" id="filmsGrid">
@@ -322,38 +510,59 @@
         </div>
     </main>
     
+    <!-- Analysis Overlay -->
     <div class="analysis-overlay" id="analysisOverlay">
-        <div class="analysis-container" id="analysisContainer"></div>
+        <div class="analysis-container" id="analysisContainer">
+            <!-- Populated by JavaScript -->
+        </div>
     </div>
     
     <script>
         let allFilms = [];
         
+        // Load films on page load
         async function loadFilms() {
             try {
                 const response = await fetch('/api/films');
                 const data = await response.json();
+                
                 allFilms = data.films || [];
+                
+                // Update stats
                 document.getElementById('totalFilms').textContent = (data.total || allFilms.length).toLocaleString();
                 document.getElementById('avgScore').textContent = data.avg_score ? data.avg_score.toFixed(1) : '7.2';
+                
                 renderFilms(allFilms);
             } catch (error) {
-                document.getElementById('filmsGrid').innerHTML = '<div class="loading">Error loading films. Please refresh.</div>';
+                console.error('Error loading films:', error);
+                document.getElementById('filmsGrid').innerHTML = `
+                    <div class="loading">Error loading films. Please refresh the page.</div>
+                `;
             }
         }
         
         function renderFilms(films) {
             const grid = document.getElementById('filmsGrid');
+            
             if (!films || films.length === 0) {
                 grid.innerHTML = '<div class="loading">No films found</div>';
                 return;
             }
+            
             grid.innerHTML = films.slice(0, 100).map(film => `
                 <div class="film-card">
                     <div class="film-title">${escapeHtml(film.title || film.Title || 'Untitled')}</div>
-                    <div class="film-meta">${film.duration || film.Duration || '?'} min | ${film.country || film.Country || 'Unknown'}</div>
-                    <div class="film-genres">${getGenreTags(film)}</div>
-                    <button class="btn-analyze" onclick='analyzeFilm(${JSON.stringify(film).replace(/'/g, "\\'")})'>🔍 Analyze Film</button>
+                    <div class="film-meta">
+                        ${film.duration || film.Duration || '?'} min | 
+                        ${film.country || film.Country || 'Unknown'} | 
+                        ${film.year || film.Year || ''}
+                    </div>
+                    <div class="film-genres">
+                        ${getGenreTags(film)}
+                    </div>
+                    <button class="btn-analyze" onclick='analyzeFilm(${JSON.stringify(film).replace(/'/g, "\\'")})'>
+                        🔍 Analyze Film
+                    </button>
                 </div>
             `).join('');
         }
@@ -363,6 +572,7 @@
             if (film.genre1 || film.Genre1) genres.push(film.genre1 || film.Genre1);
             if (film.genre2 || film.Genre2) genres.push(film.genre2 || film.Genre2);
             if (genres.length === 0) genres.push('General');
+            
             return genres.map(g => `<span class="genre-tag">${escapeHtml(g)}</span>`).join('');
         }
         
@@ -375,95 +585,217 @@
         
         function filterFilms() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            if (!query) { renderFilms(allFilms); return; }
+            
+            if (!query) {
+                renderFilms(allFilms);
+                return;
+            }
+            
             const filtered = allFilms.filter(film => {
                 const title = (film.title || film.Title || '').toLowerCase();
                 const country = (film.country || film.Country || '').toLowerCase();
                 const genre1 = (film.genre1 || film.Genre1 || '').toLowerCase();
-                return title.includes(query) || country.includes(query) || genre1.includes(query);
+                const genre2 = (film.genre2 || film.Genre2 || '').toLowerCase();
+                
+                return title.includes(query) || 
+                       country.includes(query) || 
+                       genre1.includes(query) || 
+                       genre2.includes(query);
             });
+            
             renderFilms(filtered);
         }
         
         async function analyzeFilm(film) {
             const overlay = document.getElementById('analysisOverlay');
             const container = document.getElementById('analysisContainer');
-            container.innerHTML = '<div style="padding:60px;text-align:center;"><div class="loading-spinner" style="border-color:#e2e8f0;border-top-color:#48bb78;"></div><p style="color:#718096;">Analyzing...</p></div>';
+            
+            // Show loading
+            container.innerHTML = `
+                <div style="padding: 60px; text-align: center;">
+                    <div class="loading-spinner" style="border-color: #e2e8f0; border-top-color: #48bb78;"></div>
+                    <p style="color: #718096; margin-top: 20px;">Analyzing "${film.title || film.Title}"...</p>
+                </div>
+            `;
             overlay.classList.add('active');
             
             try {
+                // Call analysis API
                 const response = await fetch('/api/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ film })
+                    body: JSON.stringify({ film_id: film.id, film: film })
                 });
+                
                 const result = await response.json();
+                
+                // Render results
                 renderAnalysisResult(film, result);
+                
             } catch (error) {
-                renderAnalysisResult(film, generateMockResult());
+                console.error('Analysis error:', error);
+                // Show mock results for demo
+                renderAnalysisResult(film, generateMockResult(film));
             }
         }
         
-        function generateMockResult() {
+        function generateMockResult(film) {
             const score = (Math.random() * 3 + 5).toFixed(1);
             return {
                 score: parseFloat(score),
                 pathway: score > 6.5 ? 'THEATRICAL' : 'FESTIVAL',
-                predictions: { festival_selection: Math.floor(Math.random()*40+40), distribution_deal: Math.floor(Math.random()*30+30), award_nomination: Math.floor(Math.random()*20+10), viral_potential: Math.floor(Math.random()*15+5) },
-                festivals: [{ name: 'Sundance', score: 85 }, { name: 'Toronto', score: 78 }, { name: 'Berlin', score: 72 }, { name: 'Cannes', score: 65 }, { name: 'Venice', score: 60 }],
-                distributors: [{ name: 'A24', score: 72 }, { name: 'Netflix', score: 68 }, { name: 'Amazon', score: 65 }, { name: 'MUBI', score: 58 }, { name: 'Neon', score: 55 }]
+                predictions: {
+                    festival_selection: Math.floor(Math.random() * 40 + 40),
+                    distribution_deal: Math.floor(Math.random() * 30 + 30),
+                    award_nomination: Math.floor(Math.random() * 20 + 10),
+                    viral_potential: Math.floor(Math.random() * 15 + 5)
+                },
+                festivals: [
+                    { name: 'Sundance Film Festival', score: 85 },
+                    { name: 'Toronto International', score: 78 },
+                    { name: 'Berlin Film Festival', score: 72 },
+                    { name: 'Cannes Film Festival', score: 65 },
+                    { name: 'Venice Film Festival', score: 60 }
+                ],
+                distributors: [
+                    { name: 'A24', score: 72 },
+                    { name: 'Netflix', score: 68 },
+                    { name: 'Amazon Studios', score: 65 },
+                    { name: 'MUBI', score: 58 },
+                    { name: 'Neon', score: 55 }
+                ]
             };
         }
         
         function renderAnalysisResult(film, result) {
             const container = document.getElementById('analysisContainer');
+            
+            const pathwayColor = result.pathway === 'THEATRICAL' ? '#48bb78' : '#4299e1';
+            
             container.innerHTML = `
                 <div class="analysis-header">
                     <button class="close-btn" onclick="closeAnalysis()">×</button>
                     <h2 class="analysis-title">${escapeHtml(film.title || film.Title)}</h2>
-                    <p class="analysis-meta">${film.duration || '?'} min | ${film.country || 'Unknown'}</p>
+                    <p class="analysis-meta">${film.duration || film.Duration || '?'} min | ${film.country || film.Country || 'Unknown'} | ${film.year || film.Year || ''}</p>
                 </div>
+                
                 <div class="score-section">
                     <div class="main-score">
                         <div class="score-circle">${result.score}/10</div>
-                        <span class="pathway-badge">${result.pathway}</span>
+                        <span class="pathway-badge" style="background: ${pathwayColor}">${result.pathway}</span>
                     </div>
                     <div class="predictions-grid">
-                        <div class="prediction-item"><div class="prediction-value">${result.predictions.festival_selection}%</div><div class="prediction-label">Festival Selection</div></div>
-                        <div class="prediction-item"><div class="prediction-value">${result.predictions.distribution_deal}%</div><div class="prediction-label">Distribution Deal</div></div>
-                        <div class="prediction-item"><div class="prediction-value">${result.predictions.award_nomination}%</div><div class="prediction-label">Award Nomination</div></div>
-                        <div class="prediction-item"><div class="prediction-value">${result.predictions.viral_potential}%</div><div class="prediction-label">Viral Potential</div></div>
+                        <div class="prediction-item">
+                            <div class="prediction-value">${result.predictions.festival_selection}%</div>
+                            <div class="prediction-label">Festival Selection</div>
+                        </div>
+                        <div class="prediction-item">
+                            <div class="prediction-value">${result.predictions.distribution_deal}%</div>
+                            <div class="prediction-label">Distribution Deal</div>
+                        </div>
+                        <div class="prediction-item">
+                            <div class="prediction-value">${result.predictions.award_nomination}%</div>
+                            <div class="prediction-label">Award Nomination</div>
+                        </div>
+                        <div class="prediction-item">
+                            <div class="prediction-value">${result.predictions.viral_potential}%</div>
+                            <div class="prediction-label">Viral Potential</div>
+                        </div>
                     </div>
                 </div>
+                
                 <div class="tabs">
                     <button class="tab active" onclick="showTab('predictions')">📊 Predictions</button>
-                    <button class="tab" onclick="showTab('ranking')">📈 Festivals</button>
-                    <button class="tab" onclick="showTab('matches')">🎯 Distributors</button>
+                    <button class="tab" onclick="showTab('ranking')">📈 Ranking</button>
+                    <button class="tab" onclick="showTab('revenue')">💰 Revenue</button>
+                    <button class="tab" onclick="showTab('matches')">🎯 Matches</button>
                 </div>
+                
                 <div class="tab-content active" id="tab-predictions">
+                    <h3 style="margin-bottom: 15px; color: #1a365d;">Success Predictions</h3>
                     <ul class="match-list">
-                        <li class="match-item"><span class="match-name">Festival Selection</span><span class="match-score ${result.predictions.festival_selection>50?'high':''}">${result.predictions.festival_selection}%</span></li>
-                        <li class="match-item"><span class="match-name">Distribution Deal</span><span class="match-score ${result.predictions.distribution_deal>50?'high':''}">${result.predictions.distribution_deal}%</span></li>
-                        <li class="match-item"><span class="match-name">Award Nomination</span><span class="match-score ${result.predictions.award_nomination>30?'high':''}">${result.predictions.award_nomination}%</span></li>
-                        <li class="match-item"><span class="match-name">Viral Potential</span><span class="match-score">${result.predictions.viral_potential}%</span></li>
+                        <li class="match-item">
+                            <span class="match-name">Festival Selection</span>
+                            <span class="match-score ${result.predictions.festival_selection > 50 ? 'high' : ''}">${result.predictions.festival_selection}%</span>
+                        </li>
+                        <li class="match-item">
+                            <span class="match-name">Distribution Deal</span>
+                            <span class="match-score ${result.predictions.distribution_deal > 50 ? 'high' : ''}">${result.predictions.distribution_deal}%</span>
+                        </li>
+                        <li class="match-item">
+                            <span class="match-name">Award Nomination</span>
+                            <span class="match-score ${result.predictions.award_nomination > 30 ? 'high' : ''}">${result.predictions.award_nomination}%</span>
+                        </li>
+                        <li class="match-item">
+                            <span class="match-name">Viral Potential</span>
+                            <span class="match-score">${result.predictions.viral_potential}%</span>
+                        </li>
                     </ul>
                 </div>
+                
                 <div class="tab-content" id="tab-ranking">
-                    <ul class="match-list">${result.festivals.map(f=>`<li class="match-item"><span class="match-name">${f.name}</span><span class="match-score ${f.score>70?'high':''}">${f.score}%</span></li>`).join('')}</ul>
+                    <h3 style="margin-bottom: 15px; color: #1a365d;">Festival Rankings</h3>
+                    <ul class="match-list">
+                        ${result.festivals.map(f => `
+                            <li class="match-item">
+                                <span class="match-name">${f.name}</span>
+                                <span class="match-score ${f.score > 70 ? 'high' : ''}">${f.score}%</span>
+                            </li>
+                        `).join('')}
+                    </ul>
                 </div>
+                
+                <div class="tab-content" id="tab-revenue">
+                    <h3 style="margin-bottom: 15px; color: #1a365d;">Revenue Estimation</h3>
+                    <ul class="match-list">
+                        <li class="match-item">
+                            <span class="match-name">Box Office (Low)</span>
+                            <span class="match-score">$50K - $150K</span>
+                        </li>
+                        <li class="match-item">
+                            <span class="match-name">Box Office (High)</span>
+                            <span class="match-score high">$500K - $2M</span>
+                        </li>
+                        <li class="match-item">
+                            <span class="match-name">Streaming Rights</span>
+                            <span class="match-score">$25K - $100K</span>
+                        </li>
+                        <li class="match-item">
+                            <span class="match-name">International Sales</span>
+                            <span class="match-score">$75K - $300K</span>
+                        </li>
+                    </ul>
+                </div>
+                
                 <div class="tab-content" id="tab-matches">
-                    <ul class="match-list">${result.distributors.map(d=>`<li class="match-item"><span class="match-name">${d.name}</span><span class="match-score ${d.score>65?'high':''}">${d.score}%</span></li>`).join('')}</ul>
+                    <h3 style="margin-bottom: 15px; color: #1a365d;">Top Distributor Matches</h3>
+                    <ul class="match-list">
+                        ${result.distributors.map(d => `
+                            <li class="match-item">
+                                <span class="match-name">${d.name}</span>
+                                <span class="match-score ${d.score > 65 ? 'high' : ''}">${d.score}%</span>
+                            </li>
+                        `).join('')}
+                    </ul>
                 </div>
+                
                 <div class="analysis-footer">
-                    <button class="btn-report">📄 View Full Report</button>
-                    <button class="btn-close-bottom" onclick="closeAnalysis()">Close</button>
+                    <button class="btn-report" onclick="downloadReport('${escapeHtml(film.title || film.Title)}')">
+                        📄 View Full Report
+                    </button>
+                    <button class="btn-close-bottom" onclick="closeAnalysis()">
+                        Close
+                    </button>
                 </div>
             `;
         }
         
         function showTab(tabName) {
+            // Remove active from all tabs and content
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active to clicked tab
             event.target.classList.add('active');
             document.getElementById('tab-' + tabName).classList.add('active');
         }
@@ -472,14 +804,30 @@
             document.getElementById('analysisOverlay').classList.remove('active');
         }
         
+        // Close on overlay click (not container)
         document.getElementById('analysisOverlay').addEventListener('click', function(e) {
-            if (e.target === this) closeAnalysis();
+            if (e.target === this) {
+                closeAnalysis();
+            }
         });
         
+        // Close on Escape key
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeAnalysis();
+            if (e.key === 'Escape') {
+                closeAnalysis();
+            }
         });
         
+        function downloadReport(title) {
+            alert(`Full PDF report for "${title}" will be generated. This feature uses 1 credit.`);
+            // TODO: Implement PDF download
+        }
+        
+        function toggleFilters() {
+            alert('Advanced filters coming soon!');
+        }
+        
+        // Load films on page load
         loadFilms();
     </script>
 </body>
