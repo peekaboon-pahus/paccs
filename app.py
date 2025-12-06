@@ -803,6 +803,9 @@ def admin_feature(profile_id):
 @app.route('/streaming')
 def streaming_page(): return render_template('watch.html')
 
+@app.route('/earnings')
+def earnings_page(): return render_template('earnings.html')
+
 # ============================================
 # API ROUTES - PDF
 # ============================================
