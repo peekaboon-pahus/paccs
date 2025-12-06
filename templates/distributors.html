@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distributors | PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #fff; min-height: 100vh; }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar { width: 240px; background: #0f0f15; border-right: 1px solid rgba(255,255,255,0.1); padding: 24px 16px; position: fixed; height: 100vh; }
+        .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #a855f7, #22c55e); border-radius: 10px; }
+        .logo span { font-size: 20px; font-weight: 700; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; color: rgba(255,255,255,0.6); text-decoration: none; margin-bottom: 4px; font-size: 14px; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-item.active { background: rgba(168,85,247,0.15); color: #a855f7; }
+        .nav-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); padding: 16px 16px 8px; text-transform: uppercase; }
+        .main { flex: 1; margin-left: 240px; padding: 32px; }
+        .header { margin-bottom: 32px; }
+        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .header p { color: rgba(255,255,255,0.6); }
+        .filters { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .filter-btn { padding: 10px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: rgba(255,255,255,0.7); font-size: 13px; cursor: pointer; }
+        .filter-btn:hover { background: rgba(255,255,255,0.05); }
+        .filter-btn.active { background: #a855f7; border-color: #a855f7; color: #fff; }
+        .search-box { flex: 1; min-width: 200px; padding: 10px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; font-size: 14px; }
+        .search-box:focus { outline: none; border-color: #a855f7; }
+        .search-box::placeholder { color: rgba(255,255,255,0.3); }
+        .distributors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .distributor-card { background: #1a1a2e; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s; }
+        .distributor-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+        .distributor-header { padding: 24px; display: flex; gap: 16px; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .distributor-logo { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; }
+        .distributor-info { flex: 1; }
+        .distributor-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .distributor-type { font-size: 13px; color: rgba(255,255,255,0.5); }
+        .distributor-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .distributor-badge.major { background: rgba(234,179,8,0.2); color: #eab308; }
+        .distributor-badge.indie { background: rgba(168,85,247,0.2); color: #a855f7; }
+        .distributor-badge.streaming { background: rgba(59,130,246,0.2); color: #3b82f6; }
+        .distributor-content { padding: 20px 24px; }
+        .distributor-desc { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.5; margin-bottom: 16px; }
+        .distributor-stats { display: flex; gap: 20px; margin-bottom: 16px; }
+        .stat-item { }
+        .stat-value { font-size: 16px; font-weight: 600; }
+        .stat-label { font-size: 11px; color: rgba(255,255,255,0.4); }
+        .match-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .match-label { font-size: 13px; color: rgba(255,255,255,0.5); }
+        .match-bar { flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+        .match-fill { height: 100%; border-radius: 4px; }
+        .match-fill.high { background: linear-gradient(90deg, #22c55e, #16a34a); }
+        .match-fill.medium { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .match-percent { font-size: 14px; font-weight: 600; min-width: 40px; }
+        .match-percent.high { color: #22c55e; }
+        .match-percent.medium { color: #f59e0b; }
+        .genres { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .genre-tag { padding: 4px 10px; background: rgba(255,255,255,0.05); border-radius: 20px; font-size: 11px; color: rgba(255,255,255,0.6); }
+        .distributor-actions { display: flex; gap: 8px; }
+        .dist-btn { flex: 1; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; text-align: center; }
+        .dist-btn.primary { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; }
+        .dist-btn.secondary { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); }
+        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo"><div class="logo-icon"></div><span>PACCS</span></div>
+            <a href="/dashboard" class="nav-item">📊 Dashboard</a>
+            <a href="/my-films" class="nav-item">🎬 My Films</a>
+            <div class="nav-label">Analysis</div>
+            <a href="/trailer-analysis" class="nav-item">🎥 Trailer Analysis</a>
+            <a href="/script-analysis" class="nav-item">📝 Script Analysis</a>
+            <div class="nav-label">Discover</div>
+            <a href="/festivals" class="nav-item">🏆 Festivals</a>
+            <a href="/distributors" class="nav-item active">🌍 Distributors</a>
+            <div class="nav-label">Monetize</div>
+            <a href="/streaming" class="nav-item">▶️ Streaming</a>
+            <a href="/earnings" class="nav-item">💰 Earnings</a>
+        </aside>
+        
+        <main class="main">
+            <div class="header">
+                <h1>🌍 Distributors</h1>
+                <p>Find distribution partners matched to your film's profile</p>
+            </div>
+            
+            <div class="filters">
+                <button class="filter-btn active">All Distributors</button>
+                <button class="filter-btn">Major Studios</button>
+                <button class="filter-btn">Indie</button>
+                <button class="filter-btn">Streaming</button>
+                <button class="filter-btn">International</button>
+                <input type="text" class="search-box" placeholder="🔍 Search distributors...">
+            </div>
+            
+            <div class="distributors-grid">
+                <div class="distributor-card">
+                    <div class="distributor-header">
+                        <div class="distributor-logo" style="background: linear-gradient(135deg, #ef4444, #dc2626);">A24</div>
+                        <div class="distributor-info">
+                            <h3 class="distributor-name">A24</h3>
+                            <p class="distributor-type">Independent Studio</p>
+                        </div>
+                        <span class="distributor-badge indie">Indie</span>
+                    </div>
+                    <div class="distributor-content">
+                        <p class="distributor-desc">Known for bold, visionary filmmaking. Focuses on auteur-driven films with unique perspectives and strong artistic vision.</p>
+                        <div class="distributor-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">150+</div>
+                                <div class="stat-label">Films Released</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">$2-15M</div>
+                                <div class="stat-label">Typical Budget</div>
+                            </div>
+                        </div>
+                        <div class="match-row">
+                            <span class="match-label">Match</span>
+                            <div class="match-bar"><div class="match-fill high" style="width: 85%"></div></div>
+                            <span class="match-percent high">85%</span>
+                        </div>
+                        <div class="genres">
+                            <span class="genre-tag">Drama</span>
+                            <span class="genre-tag">Horror</span>
+                            <span class="genre-tag">Sci-Fi</span>
+                            <span class="genre-tag">Comedy</span>
+                        </div>
+                        <div class="distributor-actions">
+                            <button class="dist-btn primary">Submit Package</button>
+                            <button class="dist-btn secondary">View Details</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="distributor-card">
+                    <div class="distributor-header">
+                        <div class="distributor-logo" style="background: linear-gradient(135deg, #e50914, #b20710);">N</div>
+                        <div class="distributor-info">
+                            <h3 class="distributor-name">Netflix</h3>
+                            <p class="distributor-type">Streaming Platform</p>
+                        </div>
+                        <span class="distributor-badge streaming">Streaming</span>
+                    </div>
+                    <div class="distributor-content">
+                        <p class="distributor-desc">Global streaming giant acquiring diverse content across all genres. Strong focus on international and documentary content.</p>
+                        <div class="distributor-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">190+</div>
+                                <div class="stat-label">Countries</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">$5-200M</div>
+                                <div class="stat-label">Acquisition Range</div>
+                            </div>
+                        </div>
+                        <div class="match-row">
+                            <span class="match-label">Match</span>
+                            <div class="match-bar"><div class="match-fill high" style="width: 72%"></div></div>
+                            <span class="match-percent high">72%</span>
+                        </div>
+                        <div class="genres">
+                            <span class="genre-tag">All Genres</span>
+                            <span class="genre-tag">Documentary</span>
+                            <span class="genre-tag">International</span>
+                        </div>
+                        <div class="distributor-actions">
+                            <button class="dist-btn primary">Submit Package</button>
+                            <button class="dist-btn secondary">View Details</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="distributor-card">
+                    <div class="distributor-header">
+                        <div class="distributor-logo" style="background: linear-gradient(135deg, #f59e0b, #d97706);">NEON</div>
+                        <div class="distributor-info">
+                            <h3 class="distributor-name">NEON</h3>
+                            <p class="distributor-type">Independent Distributor</p>
+                        </div>
+                        <span class="distributor-badge indie">Indie</span>
+                    </div>
+                    <div class="distributor-content">
+                        <p class="distributor-desc">Boutique distributor behind Parasite, Pig, and Spencer. Known for bold marketing and festival darlings.</p>
+                        <div class="distributor-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">50+</div>
+                                <div class="stat-label">Films Released</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">$1-20M</div>
+                                <div class="stat-label">Typical Budget</div>
+                            </div>
+                        </div>
+                        <div class="match-row">
+                            <span class="match-label">Match</span>
+                            <div class="match-bar"><div class="match-fill high" style="width: 78%"></div></div>
+                            <span class="match-percent high">78%</span>
+                        </div>
+                        <div class="genres">
+                            <span class="genre-tag">Drama</span>
+                            <span class="genre-tag">Arthouse</span>
+                            <span class="genre-tag">Foreign</span>
+                        </div>
+                        <div class="distributor-actions">
+                            <button class="dist-btn primary">Submit Package</button>
+                            <button class="dist-btn secondary">View Details</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="distributor-card">
+                    <div class="distributor-header">
+                        <div class="distributor-logo" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">MUBI</div>
+                        <div class="distributor-info">
+                            <h3 class="distributor-name">MUBI</h3>
+                            <p class="distributor-type">Curated Streaming</p>
+                        </div>
+                        <span class="distributor-badge streaming">Streaming</span>
+                    </div>
+                    <div class="distributor-content">
+                        <p class="distributor-desc">Curated streaming service for film lovers. Focuses on acclaimed arthouse, international, and classic cinema.</p>
+                        <div class="distributor-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">190+</div>
+                                <div class="stat-label">Countries</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">$50K-2M</div>
+                                <div class="stat-label">Acquisition Range</div>
+                            </div>
+                        </div>
+                        <div class="match-row">
+                            <span class="match-label">Match</span>
+                            <div class="match-bar"><div class="match-fill high" style="width: 91%"></div></div>
+                            <span class="match-percent high">91%</span>
+                        </div>
+                        <div class="genres">
+                            <span class="genre-tag">Arthouse</span>
+                            <span class="genre-tag">International</span>
+                            <span class="genre-tag">Classic</span>
+                        </div>
+                        <div class="distributor-actions">
+                            <button class="dist-btn primary">Submit Package</button>
+                            <button class="dist-btn secondary">View Details</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="distributor-card">
+                    <div class="distributor-header">
+                        <div class="distributor-logo" style="background: linear-gradient(135deg, #00a8e1, #0077b5);">PRIME</div>
+                        <div class="distributor-info">
+                            <h3 class="distributor-name">Amazon Studios</h3>
+                            <p class="distributor-type">Streaming Platform</p>
+                        </div>
+                        <span class="distributor-badge streaming">Streaming</span>
+                    </div>
+                    <div class="distributor-content">
+                        <p class="distributor-desc">Major studio with theatrical and streaming distribution. Active buyer at festivals with focus on prestige content.</p>
+                        <div class="distributor-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">200M+</div>
+                                <div class="stat-label">Subscribers</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">$1-100M</div>
+                                <div class="stat-label">Acquisition Range</div>
+                            </div>
+                        </div>
+                        <div class="match-row">
+                            <span class="match-label">Match</span>
+                            <div class="match-bar"><div class="match-fill medium" style="width: 68%"></div></div>
+                            <span class="match-percent medium">68%</span>
+                        </div>
+                        <div class="genres">
+                            <span class="genre-tag">Drama</span>
+                            <span class="genre-tag">Comedy</span>
+                            <span class="genre-tag">Documentary</span>
+                        </div>
+                        <div class="distributor-actions">
+                            <button class="dist-btn primary">Submit Package</button>
+                            <button class="dist-btn secondary">View Details</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="distributor-card">
+                    <div class="distributor-header">
+                        <div class="distributor-logo" style="background: linear-gradient(135deg, #22c55e, #16a34a);">IFC</div>
+                        <div class="distributor-info">
+                            <h3 class="distributor-name">IFC Films</h3>
+                            <p class="distributor-type">Independent Distributor</p>
+                        </div>
+                        <span class="distributor-badge indie">Indie</span>
+                    </div>
+                    <div class="distributor-content">
+                        <p class="distributor-desc">Leading independent distributor with day-and-date releases. Strong track record with festival acquisitions.</p>
+                        <div class="distributor-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">300+</div>
+                                <div class="stat-label">Films Released</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">$100K-5M</div>
+                                <div class="stat-label">Acquisition Range</div>
+                            </div>
+                        </div>
+                        <div class="match-row">
+                            <span class="match-label">Match</span>
+                            <div class="match-bar"><div class="match-fill high" style="width: 82%"></div></div>
+                            <span class="match-percent high">82%</span>
+                        </div>
+                        <div class="genres">
+                            <span class="genre-tag">Drama</span>
+                            <span class="genre-tag">Documentary</span>
+                            <span class="genre-tag">Foreign</span>
+                        </div>
+                        <div class="distributor-actions">
+                            <button class="dist-btn primary">Submit Package</button>
+                            <button class="dist-btn secondary">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
