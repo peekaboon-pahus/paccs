@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trailer Analysis | PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #fff; min-height: 100vh; }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar { width: 240px; background: #0f0f15; border-right: 1px solid rgba(255,255,255,0.1); padding: 24px 16px; position: fixed; height: 100vh; }
+        .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #a855f7, #22c55e); border-radius: 10px; }
+        .logo span { font-size: 20px; font-weight: 700; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; color: rgba(255,255,255,0.6); text-decoration: none; margin-bottom: 4px; font-size: 14px; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-item.active { background: rgba(168,85,247,0.15); color: #a855f7; }
+        .nav-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); padding: 16px 16px 8px; text-transform: uppercase; }
+        .main { flex: 1; margin-left: 240px; padding: 32px; }
+        .header { margin-bottom: 32px; }
+        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .header p { color: rgba(255,255,255,0.6); }
+        .upload-area { background: #1a1a2e; border: 2px dashed rgba(255,255,255,0.2); border-radius: 16px; padding: 60px 40px; text-align: center; margin-bottom: 32px; cursor: pointer; transition: all 0.2s; }
+        .upload-area:hover { border-color: #a855f7; background: rgba(168,85,247,0.05); }
+        .upload-icon { font-size: 48px; margin-bottom: 16px; }
+        .upload-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .upload-text { color: rgba(255,255,255,0.5); font-size: 14px; margin-bottom: 16px; }
+        .upload-btn { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .upload-btn:hover { box-shadow: 0 4px 20px rgba(168,85,247,0.4); }
+        .or-divider { display: flex; align-items: center; margin: 24px 0; color: rgba(255,255,255,0.4); font-size: 13px; }
+        .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
+        .or-divider span { padding: 0 16px; }
+        .url-input-group { display: flex; gap: 12px; max-width: 600px; margin: 0 auto; }
+        .url-input { flex: 1; padding: 14px 16px; background: #1a1a2e; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 14px; }
+        .url-input:focus { outline: none; border-color: #a855f7; }
+        .url-input::placeholder { color: rgba(255,255,255,0.3); }
+        .results-section { display: none; }
+        .results-section.active { display: block; }
+        .score-card { background: linear-gradient(135deg, #1a1a2e, #0f0f15); border-radius: 20px; padding: 32px; text-align: center; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.1); }
+        .score-circle { width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(#a855f7 0% 75%, #1a1a2e 75% 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+        .score-inner { width: 110px; height: 110px; background: #0f0f15; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .score-value { font-size: 36px; font-weight: 700; color: #a855f7; }
+        .score-label { font-size: 12px; color: rgba(255,255,255,0.5); }
+        .score-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+        .score-subtitle { color: rgba(255,255,255,0.5); font-size: 14px; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .metric-card { background: #1a1a2e; border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .metric-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .metric-title { font-size: 14px; color: rgba(255,255,255,0.6); }
+        .metric-score { font-size: 18px; font-weight: 700; }
+        .metric-score.high { color: #22c55e; }
+        .metric-score.medium { color: #f59e0b; }
+        .metric-score.low { color: #ef4444; }
+        .metric-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+        .metric-bar-fill { height: 100%; border-radius: 3px; }
+        .metric-bar-fill.high { background: #22c55e; }
+        .metric-bar-fill.medium { background: #f59e0b; }
+        .metric-bar-fill.low { background: #ef4444; }
+        .insights-card { background: #1a1a2e; border-radius: 16px; padding: 24px; border: 1px solid rgba(255,255,255,0.1); }
+        .insights-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+        .insight-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .insight-item:last-child { border-bottom: none; }
+        .insight-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .insight-icon.positive { background: rgba(34,197,94,0.15); }
+        .insight-icon.negative { background: rgba(239,68,68,0.15); }
+        .insight-icon.neutral { background: rgba(168,85,247,0.15); }
+        .insight-text { flex: 1; }
+        .insight-text h4 { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+        .insight-text p { font-size: 13px; color: rgba(255,255,255,0.5); }
+        .actions { display: flex; gap: 12px; margin-top: 24px; }
+        .btn { padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; }
+        .btn-primary { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
+        .loading { display: none; text-align: center; padding: 60px; }
+        .loading.active { display: block; }
+        .spinner { width: 48px; height: 48px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #a855f7; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo"><div class="logo-icon"></div><span>PACCS</span></div>
+            <a href="/dashboard" class="nav-item">📊 Dashboard</a>
+            <a href="/my-films" class="nav-item">🎬 My Films</a>
+            <div class="nav-label">Analysis</div>
+            <a href="/trailer-analysis" class="nav-item active">🎥 Trailer Analysis</a>
+            <a href="/script-analysis" class="nav-item">📝 Script Analysis</a>
+            <div class="nav-label">Discover</div>
+            <a href="/festivals" class="nav-item">🏆 Festivals</a>
+            <a href="/distributors" class="nav-item">🌍 Distributors</a>
+            <div class="nav-label">Monetize</div>
+            <a href="/streaming" class="nav-item">▶️ Streaming</a>
+            <a href="/earnings" class="nav-item">💰 Earnings</a>
+        </aside>
+        
+        <main class="main">
+            <div class="header">
+                <h1>🎥 Trailer Analysis</h1>
+                <p>Upload your trailer to get AI-powered insights and market predictions</p>
+            </div>
+            
+            <div id="upload-section">
+                <div class="upload-area" onclick="document.getElementById('file-input').click()">
+                    <div class="upload-icon">🎬</div>
+                    <h3 class="upload-title">Drop your trailer here</h3>
+                    <p class="upload-text">MP4, MOV, or AVI • Max 500MB</p>
+                    <button class="upload-btn">Choose File</button>
+                    <input type="file" id="file-input" accept="video/*" style="display:none" onchange="handleFileUpload(this)">
+                </div>
+                
+                <div class="or-divider"><span>or paste a link</span></div>
+                
+                <div class="url-input-group">
+                    <input type="text" class="url-input" id="url-input" placeholder="YouTube or Vimeo URL">
+                    <button class="upload-btn" onclick="analyzeUrl()">Analyze</button>
+                </div>
+            </div>
+            
+            <div id="loading-section" class="loading">
+                <div class="spinner"></div>
+                <h3>Analyzing your trailer...</h3>
+                <p style="color: rgba(255,255,255,0.5);">This usually takes 30-60 seconds</p>
+            </div>
+            
+            <div id="results-section" class="results-section">
+                <div class="score-card">
+                    <div class="score-circle">
+                        <div class="score-inner">
+                            <div class="score-value" id="overall-score">78</div>
+                            <div class="score-label">PACCS Score</div>
+                        </div>
+                    </div>
+                    <h2 class="score-title">Strong Festival Potential</h2>
+                    <p class="score-subtitle">Your trailer scores above 70% of submissions</p>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Visual Quality</span>
+                            <span class="metric-score high" id="visual-score">82</span>
+                        </div>
+                        <div class="metric-bar"><div class="metric-bar-fill high" style="width: 82%"></div></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Audio & Music</span>
+                            <span class="metric-score high" id="audio-score">76</span>
+                        </div>
+                        <div class="metric-bar"><div class="metric-bar-fill high" style="width: 76%"></div></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Narrative Hook</span>
+                            <span class="metric-score medium" id="narrative-score">68</span>
+                        </div>
+                        <div class="metric-bar"><div class="metric-bar-fill medium" style="width: 68%"></div></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Market Appeal</span>
+                            <span class="metric-score high" id="market-score">74</span>
+                        </div>
+                        <div class="metric-bar"><div class="metric-bar-fill high" style="width: 74%"></div></div>
+                    </div>
+                </div>
+                
+                <div class="insights-card">
+                    <h3 class="insights-title">💡 AI Insights</h3>
+                    <div class="insight-item">
+                        <div class="insight-icon positive">✓</div>
+                        <div class="insight-text">
+                            <h4>Strong opening hook</h4>
+                            <p>First 5 seconds effectively capture attention with dynamic visuals</p>
+                        </div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon positive">✓</div>
+                        <div class="insight-text">
+                            <h4>Excellent color grading</h4>
+                            <p>Consistent visual style that matches festival-quality productions</p>
+                        </div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon negative">!</div>
+                        <div class="insight-text">
+                            <h4>Pacing could be tighter</h4>
+                            <p>Consider trimming 10-15 seconds from the middle section</p>
+                        </div>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-icon neutral">→</div>
+                        <div class="insight-text">
+                            <h4>Festival recommendation</h4>
+                            <p>Best suited for: Tribeca, SXSW, BFI London Film Festival</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="downloadReport()">📥 Download Report</button>
+                    <button class="btn btn-secondary" onclick="resetAnalysis()">🔄 Analyze Another</button>
+                    <button class="btn btn-secondary" onclick="window.location.href='/festivals'">🏆 Find Festivals</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        function handleFileUpload(input) {
+            if (input.files && input.files[0]) {
+                startAnalysis();
+            }
+        }
+        
+        function analyzeUrl() {
+            const url = document.getElementById('url-input').value;
+            if (url) {
+                startAnalysis();
+            }
+        }
+        
+        function startAnalysis() {
+            document.getElementById('upload-section').style.display = 'none';
+            document.getElementById('loading-section').classList.add('active');
+            
+            // Simulate analysis
+            setTimeout(() => {
+                document.getElementById('loading-section').classList.remove('active');
+                document.getElementById('results-section').classList.add('active');
+                
+                // Random scores for demo
+                const overall = Math.floor(Math.random() * 25) + 65;
+                document.getElementById('overall-score').textContent = overall;
+            }, 3000);
+        }
+        
+        function resetAnalysis() {
+            document.getElementById('results-section').classList.remove('active');
+            document.getElementById('upload-section').style.display = 'block';
+            document.getElementById('url-input').value = '';
+        }
+        
+        function downloadReport() {
+            alert('Report download coming soon!');
+        }
+    </script>
+</body>
+</html>

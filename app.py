@@ -131,6 +131,9 @@ def login_page(): return render_template('login.html')
 @app.route('/dashboard')
 def dashboard_page(): return render_template('dashboard.html')
 
+@app.route('/trailer-analysis')
+def trailer_analysis_page(): return render_template('trailer-analysis.html')
+
 @app.route('/submit')
 def submit_page(): return render_template('submit.html')
 
