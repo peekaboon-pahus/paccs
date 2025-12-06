@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earnings | PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #fff; min-height: 100vh; }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar { width: 240px; background: #0f0f15; border-right: 1px solid rgba(255,255,255,0.1); padding: 24px 16px; position: fixed; height: 100vh; }
+        .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #a855f7, #22c55e); border-radius: 10px; }
+        .logo span { font-size: 20px; font-weight: 700; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; color: rgba(255,255,255,0.6); text-decoration: none; margin-bottom: 4px; font-size: 14px; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-item.active { background: rgba(168,85,247,0.15); color: #a855f7; }
+        .nav-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); padding: 16px 16px 8px; text-transform: uppercase; }
+        .main { flex: 1; margin-left: 240px; padding: 32px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .header-left h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .header-left p { color: rgba(255,255,255,0.6); }
+        .withdraw-btn { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+        .stat-card { background: #1a1a2e; border-radius: 16px; padding: 24px; border: 1px solid rgba(255,255,255,0.1); }
+        .stat-card.highlight { background: linear-gradient(135deg, #1a1a2e, #1e3a2e); border-color: rgba(34,197,94,0.3); }
+        .stat-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+        .stat-value { font-size: 32px; font-weight: 700; }
+        .stat-value.green { color: #22c55e; }
+        .stat-value.purple { color: #a855f7; }
+        .stat-value.blue { color: #3b82f6; }
+        .stat-change { font-size: 13px; color: #22c55e; margin-top: 8px; }
+        .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+        .chart-card { background: #1a1a2e; border-radius: 16px; padding: 24px; border: 1px solid rgba(255,255,255,0.1); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .card-title { font-size: 18px; font-weight: 600; }
+        .chart-placeholder { height: 200px; background: rgba(255,255,255,0.02); border-radius: 12px; display: flex; align-items: flex-end; justify-content: space-around; padding: 20px; }
+        .chart-bar { width: 40px; background: linear-gradient(180deg, #a855f7, #7c3aed); border-radius: 6px 6px 0 0; }
+        .transactions-card { background: #1a1a2e; border-radius: 16px; padding: 24px; border: 1px solid rgba(255,255,255,0.1); }
+        .transaction-item { display: flex; align-items: center; gap: 12px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .transaction-item:last-child { border-bottom: none; }
+        .transaction-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .transaction-icon.rental { background: rgba(59,130,246,0.15); }
+        .transaction-icon.license { background: rgba(168,85,247,0.15); }
+        .transaction-info { flex: 1; }
+        .transaction-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+        .transaction-meta { font-size: 12px; color: rgba(255,255,255,0.4); }
+        .transaction-amount { font-size: 14px; font-weight: 600; }
+        .transaction-amount.positive { color: #22c55e; }
+        .films-earnings { margin-top: 24px; }
+        .film-earning-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: rgba(255,255,255,0.02); border-radius: 12px; margin-bottom: 12px; }
+        .film-thumb { width: 60px; height: 40px; background: linear-gradient(135deg, #2a2a4e, #1a1a2e); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .film-info { flex: 1; }
+        .film-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+        .film-stats { font-size: 12px; color: rgba(255,255,255,0.4); }
+        .film-revenue { text-align: right; }
+        .film-amount { font-size: 16px; font-weight: 600; color: #22c55e; }
+        .film-rentals { font-size: 12px; color: rgba(255,255,255,0.4); }
+        @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; } .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo"><div class="logo-icon"></div><span>PACCS</span></div>
+            <a href="/dashboard" class="nav-item">📊 Dashboard</a>
+            <a href="/my-films" class="nav-item">🎬 My Films</a>
+            <div class="nav-label">Analysis</div>
+            <a href="/trailer-analysis" class="nav-item">🎥 Trailer Analysis</a>
+            <a href="/script-analysis" class="nav-item">📝 Script Analysis</a>
+            <div class="nav-label">Discover</div>
+            <a href="/festivals" class="nav-item">🏆 Festivals</a>
+            <a href="/distributors" class="nav-item">🌍 Distributors</a>
+            <div class="nav-label">Monetize</div>
+            <a href="/streaming" class="nav-item">▶️ Streaming</a>
+            <a href="/earnings" class="nav-item active">💰 Earnings</a>
+        </aside>
+        
+        <main class="main">
+            <div class="header">
+                <div class="header-left">
+                    <h1>💰 Earnings</h1>
+                    <p>Track your revenue from streaming and licensing</p>
+                </div>
+                <button class="withdraw-btn">💳 Withdraw Funds</button>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card highlight">
+                    <div class="stat-label">Available Balance</div>
+                    <div class="stat-value green">£247.80</div>
+                    <div class="stat-change">Ready to withdraw</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">This Month</div>
+                    <div class="stat-value purple">£89.50</div>
+                    <div class="stat-change">↑ 23% vs last month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Earnings</div>
+                    <div class="stat-value">£1,247.30</div>
+                    <div class="stat-change">Since Oct 2024</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Rentals</div>
+                    <div class="stat-value blue">312</div>
+                    <div class="stat-change">↑ 18% vs last month</div>
+                </div>
+            </div>
+            
+            <div class="content-grid">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Revenue Over Time</h3>
+                    </div>
+                    <div class="chart-placeholder">
+                        <div class="chart-bar" style="height: 60px;"></div>
+                        <div class="chart-bar" style="height: 90px;"></div>
+                        <div class="chart-bar" style="height: 75px;"></div>
+                        <div class="chart-bar" style="height: 120px;"></div>
+                        <div class="chart-bar" style="height: 95px;"></div>
+                        <div class="chart-bar" style="height: 140px;"></div>
+                    </div>
+                    
+                    <div class="films-earnings">
+                        <h4 style="margin-bottom: 16px; font-size: 16px;">Top Performing Films</h4>
+                        <div class="film-earning-item">
+                            <div class="film-thumb">🎬</div>
+                            <div class="film-info">
+                                <div class="film-title">Second Home</div>
+                                <div class="film-stats">Feature • Drama • 94 min</div>
+                            </div>
+                            <div class="film-revenue">
+                                <div class="film-amount">£892.50</div>
+                                <div class="film-rentals">178 rentals</div>
+                            </div>
+                        </div>
+                        <div class="film-earning-item">
+                            <div class="film-thumb">🎥</div>
+                            <div class="film-info">
+                                <div class="film-title">The Last Light</div>
+                                <div class="film-stats">Short • Thriller • 18 min</div>
+                            </div>
+                            <div class="film-revenue">
+                                <div class="film-amount">£354.80</div>
+                                <div class="film-rentals">134 rentals</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="transactions-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Activity</h3>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-icon rental">🎬</div>
+                        <div class="transaction-info">
+                            <div class="transaction-title">Film Rental</div>
+                            <div class="transaction-meta">Second Home • 2 hours ago</div>
+                        </div>
+                        <div class="transaction-amount positive">+£3.50</div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-icon rental">🎬</div>
+                        <div class="transaction-info">
+                            <div class="transaction-title">Film Rental</div>
+                            <div class="transaction-meta">The Last Light • 5 hours ago</div>
+                        </div>
+                        <div class="transaction-amount positive">+£2.10</div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-icon license">🎵</div>
+                        <div class="transaction-info">
+                            <div class="transaction-title">Music License</div>
+                            <div class="transaction-meta">Midnight Dreams • Yesterday</div>
+                        </div>
+                        <div class="transaction-amount positive">+£35.00</div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-icon rental">🎬</div>
+                        <div class="transaction-info">
+                            <div class="transaction-title">Film Rental</div>
+                            <div class="transaction-meta">Second Home • Dec 1</div>
+                        </div>
+                        <div class="transaction-amount positive">+£3.50</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
