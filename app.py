@@ -90,6 +90,26 @@ films_data = load_films()
 print(f"Loaded {len(films_data)} films")
 
 # ============================================
+# FIREBASE AUTH
+# ============================================
+
+@app.route('/auth/verify', methods=['POST'])
+def verify_auth():
+    try:
+        data = request.get_json()
+        id_token = data.get('idToken')
+        if not id_token:
+            return jsonify({'error': 'No token provided'}), 400
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Auth error: {e}")
+        return jsonify({'error': str(e)}), 401
+
+@app.route('/auth/logout', methods=['POST'])
+def logout():
+    return jsonify({'success': True})
+
+# ============================================
 # PAGE ROUTES
 # ============================================
 
@@ -380,7 +400,6 @@ def rent_film():
     if not film: return jsonify({'error': 'Film not found'}), 404
     
     if film['price'] == 0:
-        # Free film - grant access directly
         rentals = load_rentals()
         rentals.append({
             'id': str(uuid.uuid4())[:8], 'film_id': film_id, 'user_email': email,
@@ -415,7 +434,6 @@ def verify_rental():
             email = session.metadata.get('user_email', '')
             price = float(session.metadata.get('price', 0))
             
-            # Record rental
             rentals = load_rentals()
             rentals.append({
                 'id': str(uuid.uuid4())[:8], 'film_id': film_id, 'user_email': email,
@@ -426,7 +444,6 @@ def verify_rental():
             })
             save_rentals(rentals)
             
-            # Update film stats
             films = load_streaming_films()
             for f in films:
                 if f['id'] == film_id:
@@ -439,7 +456,6 @@ def verify_rental():
         return jsonify({'success': False, 'error': 'Payment not completed'})
     except Exception as e: return jsonify({'success': False, 'error': str(e)})
 
-# Admin streaming routes
 @app.route('/api/admin/streaming')
 def admin_streaming():
     films = load_streaming_films()
@@ -544,7 +560,6 @@ def license_music():
         return jsonify({'sessionId': session.id, 'url': session.url})
     except Exception as e: return jsonify({'error': str(e)}), 500
 
-# Admin music routes
 @app.route('/api/admin/music')
 def admin_music():
     tracks = load_music()
@@ -629,7 +644,6 @@ def score_entry(entry_id):
                 e['judge_notes'] = data.get('judge_notes', '')
                 e['status'] = data.get('status', 'reviewed')
                 
-                # Calculate average PACCS score
                 scores = [e['score_artistic'], e['score_market'], e['score_technical'], e['score_impact']]
                 e['paccs_score'] = round(sum(s for s in scores if s) / len([s for s in scores if s]))
                 
@@ -651,7 +665,6 @@ def make_winner(entry_id):
                 e['status'] = 'winner'
                 save_entries(entries)
                 
-                # Add to winners list
                 winner = {
                     'id': e['id'],
                     'title': e['title'],
@@ -683,7 +696,6 @@ def onboard_to_streaming(entry_id):
         
         for e in entries:
             if e['id'] == entry_id:
-                # Create streaming film from entry
                 film_id = str(uuid.uuid4())[:8]
                 new_film = {
                     'id': film_id,
@@ -711,11 +723,9 @@ def onboard_to_streaming(entry_id):
                 films.append(new_film)
                 save_streaming_films(films)
                 
-                # Update entry with streaming ID
                 e['streaming_id'] = film_id
                 save_entries(entries)
                 
-                # Update winner if exists
                 winners = load_winners()
                 for w in winners:
                     if w['id'] == entry_id:
