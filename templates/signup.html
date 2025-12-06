@@ -4,11 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join PACCS - Create Your Filmmaker Profile</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbNnLMpNumxENA4yLdHveechKMnXPXnJU",
+            authDomain: "paccs-platform.firebaseapp.com",
+            projectId: "paccs-platform",
+            storageBucket: "paccs-platform.firebasestorage.app",
+            messagingSenderId: "943739075498",
+            appId: "1:943739075498:web:fdeb678de99e784e8b3398"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            background: #0a0a0f;
             min-height: 100vh;
             color: #fff;
         }
@@ -372,11 +385,57 @@
         }
         
         .step-line.completed { background: #22c55e; }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.9em;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .divider span {
+            padding: 0 15px;
+        }
+        
+        .google-btn {
+            width: 100%;
+            padding: 14px;
+            background: #fff;
+            color: #333;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+        
+        .google-btn:hover {
+            background: #f0f0f0;
+        }
+        
+        .google-btn img {
+            width: 20px;
+            height: 20px;
+        }
     </style>
 </head>
 <body>
     <header class="header">
-        <div class="logo">🎬 <span>PACCS</span></div>
+        <a href="/" class="logo" style="text-decoration: none; color: #fff;">🎬 <span>PACCS</span></a>
         <div class="login-link">
             Already have an account? <a href="/login">Log in</a>
         </div>
@@ -384,22 +443,22 @@
     
     <main class="main-container">
         <div class="page-header">
-            <h1>Join <span>Peekabooⁿ</span> Club</h1>
+            <h1>Join <span>PACCS</span></h1>
             <p>Create your filmmaker profile and get discovered</p>
             <span class="free-badge">🎁 3 FREE Film Analysis Credits</span>
-        </div>
-        
-        <div class="progress-steps">
-            <div class="step active" id="step1">1</div>
-            <div class="step-line" id="line1"></div>
-            <div class="step" id="step2">2</div>
-            <div class="step-line" id="line2"></div>
-            <div class="step" id="step3">3</div>
         </div>
         
         <div class="signup-form">
             <div class="error-message" id="errorMsg"></div>
             <div class="success-message" id="successMsg"></div>
+            
+            <!-- Google Sign Up -->
+            <button type="button" class="google-btn" onclick="signUpWithGoogle()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                Continue with Google
+            </button>
+            
+            <div class="divider"><span>or sign up with email</span></div>
             
             <form id="signupForm" onsubmit="handleSignup(event)">
                 
@@ -429,129 +488,35 @@
                 </div>
                 
                 <div class="form-section" id="section2">
-                    <h3>👤 Profile Information</h3>
-                    
-                    <div class="form-group">
-                        <label>Profile Photo <span class="optional">(optional)</span></label>
-                        <div class="photo-upload">
-                            <div class="photo-preview" id="photoPreview">
-                                <span class="placeholder">👤</span>
-                            </div>
-                            <div class="photo-upload-btn">
-                                <input type="file" id="profilePhoto" accept="image/*" onchange="previewPhoto(this)">
-                                <label for="profilePhoto">📷 Upload Photo<br><small>JPG, PNG (max 5MB)</small></label>
-                            </div>
-                        </div>
-                    </div>
+                    <h3>👤 Profile Information <span class="optional">(can complete later)</span></h3>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Designation / Title <span class="required">*</span></label>
-                            <input type="text" id="designation" placeholder="e.g. Film Director, Producer" required>
+                            <label>Designation / Title <span class="optional">(optional)</span></label>
+                            <input type="text" id="designation" placeholder="e.g. Film Director, Producer">
                         </div>
                         <div class="form-group">
-                            <label>Company / Studio <span class="optional">(optional)</span></label>
-                            <input type="text" id="company" placeholder="e.g. Coromandel Productions">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Country <span class="required">*</span></label>
-                            <select id="country" required>
+                            <label>Country <span class="optional">(optional)</span></label>
+                            <select id="country">
                                 <option value="">Select your country</option>
                                 <option value="UK">United Kingdom</option>
                                 <option value="US">United States</option>
                                 <option value="IN">India</option>
+                                <option value="TH">Thailand</option>
+                                <option value="SG">Singapore</option>
                                 <option value="CA">Canada</option>
                                 <option value="AU">Australia</option>
                                 <option value="DE">Germany</option>
                                 <option value="FR">France</option>
                                 <option value="JP">Japan</option>
-                                <option value="KR">South Korea</option>
-                                <option value="SG">Singapore</option>
-                                <option value="TH">Thailand</option>
-                                <option value="AE">UAE</option>
-                                <option value="NL">Netherlands</option>
-                                <option value="ES">Spain</option>
-                                <option value="IT">Italy</option>
-                                <option value="BR">Brazil</option>
-                                <option value="MX">Mexico</option>
-                                <option value="NG">Nigeria</option>
-                                <option value="ZA">South Africa</option>
-                                <option value="NZ">New Zealand</option>
-                                <option value="IE">Ireland</option>
-                                <option value="SE">Sweden</option>
                                 <option value="OTHER">Other</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>City <span class="optional">(optional)</span></label>
-                            <input type="text" id="city" placeholder="e.g. London, Mumbai">
-                        </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Your Story / Bio <span class="required">*</span></label>
-                        <textarea id="bio" placeholder="Tell us about yourself, your journey in filmmaking, and your work..." required></textarea>
-                    </div>
-                </div>
-                
-                <div class="form-section" id="section3">
-                    <h3>🔗 Social Links <span class="optional">(optional)</span></h3>
-                    
-                    <div class="social-links-grid">
-                        <div class="social-input">
-                            <span class="icon">🎬</span>
-                            <input type="url" id="vimeo" placeholder="Vimeo URL">
-                        </div>
-                        <div class="social-input">
-                            <span class="icon">▶️</span>
-                            <input type="url" id="youtube" placeholder="YouTube Channel URL">
-                        </div>
-                        <div class="social-input">
-                            <span class="icon">📷</span>
-                            <input type="url" id="instagram" placeholder="Instagram URL">
-                        </div>
-                        <div class="social-input">
-                            <span class="icon">💼</span>
-                            <input type="url" id="linkedin" placeholder="LinkedIn URL">
-                        </div>
-                        <div class="social-input">
-                            <span class="icon">🐦</span>
-                            <input type="url" id="twitter" placeholder="Twitter/X URL">
-                        </div>
-                        <div class="social-input">
-                            <span class="icon">🌐</span>
-                            <input type="url" id="website" placeholder="Personal Website">
-                        </div>
-                        <div class="social-input">
-                            <span class="icon">🎥</span>
-                            <input type="url" id="imdb" placeholder="IMDb Profile URL">
-                        </div>
-                        <div class="social-input">
-                            <span class="icon">🎬</span>
-                            <input type="url" id="letterboxd" placeholder="Letterboxd URL">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-section" id="section4">
-                    <h3>🎥 Your Films <span class="optional">(optional)</span></h3>
-                    <p style="color: rgba(255,255,255,0.5); margin-bottom: 15px; font-size: 0.9em;">
-                        Add links to your films on Vimeo, YouTube, or other platforms.
-                    </p>
-                    
-                    <div class="film-links-list" id="filmLinksList">
-                        <div class="film-link-item">
-                            <input type="url" name="filmLinks[]" placeholder="https://vimeo.com/your-film">
-                        </div>
-                    </div>
-                    <button type="button" class="btn-add-film" onclick="addFilmLink()">+ Add Another Film</button>
                 </div>
                 
                 <button type="submit" class="btn-signup" id="signupBtn">
-                    Create My Profile →
+                    Create My Account →
                 </button>
                 
                 <p class="terms">
@@ -562,44 +527,66 @@
     </main>
     
     <script>
+        // Redirect if already logged in
         const existingUser = localStorage.getItem('paccs_user');
         if (existingUser) {
             window.location.href = '/dashboard';
         }
         
-        function previewPhoto(input) {
-            const preview = document.getElementById('photoPreview');
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.innerHTML = `<img src="${e.target.result}" alt="Profile">`;
-                };
-                reader.readAsDataURL(input.files[0]);
+        // Google Sign Up
+        async function signUpWithGoogle() {
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+            errorMsg.style.display = 'none';
+            
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await firebase.auth().signInWithPopup(provider);
+                const user = result.user;
+                
+                // Save to localStorage
+                localStorage.setItem('paccs_user', JSON.stringify({
+                    id: user.uid,
+                    email: user.email,
+                    name: user.displayName || user.email.split('@')[0],
+                    photoURL: user.photoURL,
+                    credits: 3
+                }));
+                
+                // Try to save to backend
+                try {
+                    await fetch('/api/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: user.email,
+                            firstName: user.displayName?.split(' ')[0] || '',
+                            lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
+                            firebaseUid: user.uid,
+                            photoURL: user.photoURL
+                        })
+                    });
+                } catch (e) {
+                    console.log('Backend sync optional:', e);
+                }
+                
+                successMsg.innerHTML = '🎉 Account created! Redirecting...';
+                successMsg.style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Google signup error:', error);
+                if (error.code !== 'auth/popup-closed-by-user') {
+                    errorMsg.textContent = 'Google sign up failed. Please try again.';
+                    errorMsg.style.display = 'block';
+                }
             }
         }
         
-        function addFilmLink() {
-            const list = document.getElementById('filmLinksList');
-            const count = list.children.length;
-            
-            if (count >= 10) {
-                alert('Maximum 10 film links allowed');
-                return;
-            }
-            
-            const item = document.createElement('div');
-            item.className = 'film-link-item';
-            item.innerHTML = `
-                <input type="url" name="filmLinks[]" placeholder="https://vimeo.com/your-film">
-                <button type="button" class="btn-remove-film" onclick="removeFilmLink(this)">×</button>
-            `;
-            list.appendChild(item);
-        }
-        
-        function removeFilmLink(btn) {
-            btn.parentElement.remove();
-        }
-        
+        // Email/Password Sign Up
         async function handleSignup(e) {
             e.preventDefault();
             
@@ -616,23 +603,7 @@
                 email: document.getElementById('email').value.trim().toLowerCase(),
                 password: document.getElementById('password').value,
                 designation: document.getElementById('designation').value.trim(),
-                company: document.getElementById('company').value.trim(),
-                country: document.getElementById('country').value,
-                city: document.getElementById('city').value.trim(),
-                bio: document.getElementById('bio').value.trim(),
-                socialLinks: {
-                    vimeo: document.getElementById('vimeo').value.trim(),
-                    youtube: document.getElementById('youtube').value.trim(),
-                    instagram: document.getElementById('instagram').value.trim(),
-                    linkedin: document.getElementById('linkedin').value.trim(),
-                    twitter: document.getElementById('twitter').value.trim(),
-                    website: document.getElementById('website').value.trim(),
-                    imdb: document.getElementById('imdb').value.trim(),
-                    letterboxd: document.getElementById('letterboxd').value.trim()
-                },
-                filmLinks: Array.from(document.querySelectorAll('input[name="filmLinks[]"]'))
-                    .map(input => input.value.trim())
-                    .filter(url => url !== '')
+                country: document.getElementById('country').value
             };
             
             if (formData.password.length < 6) {
@@ -642,80 +613,66 @@
             }
             
             btn.disabled = true;
-            btn.innerHTML = 'Creating your profile...';
+            btn.innerHTML = 'Creating your account...';
             
             try {
-                const response = await fetch('/api/signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
+                // Create user in Firebase
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(
+                    formData.email, 
+                    formData.password
+                );
+                
+                // Update display name
+                await userCredential.user.updateProfile({
+                    displayName: `${formData.firstName} ${formData.lastName}`
                 });
                 
-                const data = await response.json();
+                // Save to localStorage
+                localStorage.setItem('paccs_user', JSON.stringify({
+                    id: userCredential.user.uid,
+                    email: formData.email,
+                    name: `${formData.firstName} ${formData.lastName}`,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    credits: 3
+                }));
                 
-                if (data.success) {
-                    localStorage.setItem('paccs_user', JSON.stringify({
-                        id: data.user_id,
-                        email: formData.email,
-                        name: `${formData.firstName} ${formData.lastName}`,
-                        firstName: formData.firstName,
-                        lastName: formData.lastName,
-                        credits: data.credits || 3,
-                        profileId: data.profile_id
-                    }));
-                    
-                    successMsg.innerHTML = '🎉 Profile created! Redirecting to dashboard...';
-                    successMsg.style.display = 'block';
-                    
-                    document.getElementById('step1').classList.add('completed');
-                    document.getElementById('step2').classList.add('completed');
-                    document.getElementById('step3').classList.add('completed');
-                    document.getElementById('line1').classList.add('completed');
-                    document.getElementById('line2').classList.add('completed');
-                    
-                    setTimeout(() => {
-                        window.location.href = '/dashboard';
-                    }, 2000);
-                } else {
-                    errorMsg.textContent = data.error || 'Signup failed. Please try again.';
-                    errorMsg.style.display = 'block';
-                    btn.disabled = false;
-                    btn.innerHTML = 'Create My Profile →';
+                // Try to save to backend
+                try {
+                    await fetch('/api/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ...formData,
+                            firebaseUid: userCredential.user.uid
+                        })
+                    });
+                } catch (e) {
+                    console.log('Backend sync optional:', e);
                 }
+                
+                successMsg.innerHTML = '🎉 Account created! Redirecting to dashboard...';
+                successMsg.style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1500);
+                
             } catch (error) {
-                errorMsg.textContent = 'Connection error. Please try again.';
+                let message = 'Signup failed. Please try again.';
+                if (error.code === 'auth/email-already-in-use') {
+                    message = 'This email is already registered. Please log in instead.';
+                } else if (error.code === 'auth/weak-password') {
+                    message = 'Password is too weak. Please use at least 6 characters.';
+                } else if (error.code === 'auth/invalid-email') {
+                    message = 'Invalid email address.';
+                }
+                errorMsg.textContent = message;
                 errorMsg.style.display = 'block';
                 btn.disabled = false;
-                btn.innerHTML = 'Create My Profile →';
+                btn.innerHTML = 'Create My Account →';
             }
         }
-        
-        document.querySelectorAll('#section1 input').forEach(input => {
-            input.addEventListener('input', () => {
-                const allFilled = document.getElementById('firstName').value && 
-                                 document.getElementById('lastName').value && 
-                                 document.getElementById('email').value && 
-                                 document.getElementById('password').value;
-                if (allFilled) {
-                    document.getElementById('step1').classList.add('completed');
-                    document.getElementById('step2').classList.add('active');
-                    document.getElementById('line1').classList.add('completed');
-                }
-            });
-        });
-        
-        document.querySelectorAll('#section2 input, #section2 textarea, #section2 select').forEach(input => {
-            input.addEventListener('input', () => {
-                const allFilled = document.getElementById('designation').value && 
-                                 document.getElementById('country').value && 
-                                 document.getElementById('bio').value;
-                if (allFilled) {
-                    document.getElementById('step2').classList.add('completed');
-                    document.getElementById('step3').classList.add('active');
-                    document.getElementById('line2').classList.add('completed');
-                }
-            });
-        });
     </script>
 </body>
 </html>
