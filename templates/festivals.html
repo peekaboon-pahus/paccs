@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festivals | PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #fff; min-height: 100vh; }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar { width: 240px; background: #0f0f15; border-right: 1px solid rgba(255,255,255,0.1); padding: 24px 16px; position: fixed; height: 100vh; }
+        .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #a855f7, #22c55e); border-radius: 10px; }
+        .logo span { font-size: 20px; font-weight: 700; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; color: rgba(255,255,255,0.6); text-decoration: none; margin-bottom: 4px; font-size: 14px; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-item.active { background: rgba(168,85,247,0.15); color: #a855f7; }
+        .nav-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); padding: 16px 16px 8px; text-transform: uppercase; }
+        .main { flex: 1; margin-left: 240px; padding: 32px; }
+        .header { margin-bottom: 32px; }
+        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .header p { color: rgba(255,255,255,0.6); }
+        .filters { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .filter-btn { padding: 10px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: rgba(255,255,255,0.7); font-size: 13px; cursor: pointer; }
+        .filter-btn:hover { background: rgba(255,255,255,0.05); }
+        .filter-btn.active { background: #a855f7; border-color: #a855f7; color: #fff; }
+        .search-box { flex: 1; min-width: 200px; padding: 10px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; font-size: 14px; }
+        .search-box:focus { outline: none; border-color: #a855f7; }
+        .search-box::placeholder { color: rgba(255,255,255,0.3); }
+        .festivals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .festival-card { background: #1a1a2e; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s; }
+        .festival-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+        .festival-banner { height: 120px; background: linear-gradient(135deg, #a855f7, #7c3aed); display: flex; align-items: center; justify-content: center; position: relative; }
+        .festival-logo { font-size: 40px; }
+        .festival-tier { position: absolute; top: 12px; right: 12px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .festival-tier.gold { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .festival-tier.silver { background: linear-gradient(135deg, #94a3b8, #64748b); }
+        .festival-tier.bronze { background: linear-gradient(135deg, #b45309, #92400e); }
+        .festival-content { padding: 20px; }
+        .festival-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .festival-location { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
+        .festival-stats { display: flex; gap: 16px; margin-bottom: 16px; }
+        .festival-stat { font-size: 12px; color: rgba(255,255,255,0.6); }
+        .festival-stat strong { color: #fff; }
+        .match-score { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .match-bar { flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+        .match-fill { height: 100%; border-radius: 4px; }
+        .match-fill.high { background: linear-gradient(90deg, #22c55e, #16a34a); }
+        .match-fill.medium { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .match-percent { font-size: 14px; font-weight: 600; }
+        .match-percent.high { color: #22c55e; }
+        .match-percent.medium { color: #f59e0b; }
+        .festival-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .tag { padding: 4px 10px; background: rgba(255,255,255,0.05); border-radius: 20px; font-size: 11px; color: rgba(255,255,255,0.6); }
+        .festival-deadline { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+        .festival-deadline strong { color: #ef4444; }
+        .festival-actions { display: flex; gap: 8px; }
+        .festival-btn { flex: 1; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; text-align: center; }
+        .festival-btn.primary { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; }
+        .festival-btn.secondary { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); }
+        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo"><div class="logo-icon"></div><span>PACCS</span></div>
+            <a href="/dashboard" class="nav-item">📊 Dashboard</a>
+            <a href="/my-films" class="nav-item">🎬 My Films</a>
+            <div class="nav-label">Analysis</div>
+            <a href="/trailer-analysis" class="nav-item">🎥 Trailer Analysis</a>
+            <a href="/script-analysis" class="nav-item">📝 Script Analysis</a>
+            <div class="nav-label">Discover</div>
+            <a href="/festivals" class="nav-item active">🏆 Festivals</a>
+            <a href="/distributors" class="nav-item">🌍 Distributors</a>
+            <div class="nav-label">Monetize</div>
+            <a href="/streaming" class="nav-item">▶️ Streaming</a>
+            <a href="/earnings" class="nav-item">💰 Earnings</a>
+        </aside>
+        
+        <main class="main">
+            <div class="header">
+                <h1>🏆 Film Festivals</h1>
+                <p>Discover and submit to festivals matched to your film</p>
+            </div>
+            
+            <div class="filters">
+                <button class="filter-btn active">All Festivals</button>
+                <button class="filter-btn">Accepting Now</button>
+                <button class="filter-btn">Best Match</button>
+                <button class="filter-btn">A-List</button>
+                <input type="text" class="search-box" placeholder="🔍 Search festivals...">
+            </div>
+            
+            <div class="festivals-grid">
+                <div class="festival-card">
+                    <div class="festival-banner" style="background: linear-gradient(135deg, #dc2626, #991b1b);">
+                        <span class="festival-logo">🎬</span>
+                        <span class="festival-tier gold">A-List</span>
+                    </div>
+                    <div class="festival-content">
+                        <h3 class="festival-name">Sundance Film Festival</h3>
+                        <p class="festival-location">📍 Park City, Utah, USA</p>
+                        <div class="festival-stats">
+                            <span class="festival-stat"><strong>Jan 23-Feb 2</strong></span>
+                            <span class="festival-stat">Est. 1978</span>
+                        </div>
+                        <div class="match-score">
+                            <div class="match-bar"><div class="match-fill high" style="width: 78%"></div></div>
+                            <span class="match-percent high">78%</span>
+                        </div>
+                        <div class="festival-tags">
+                            <span class="tag">Independent</span>
+                            <span class="tag">Drama</span>
+                            <span class="tag">Documentary</span>
+                        </div>
+                        <p class="festival-deadline">⏰ Deadline: <strong>Sep 15, 2025</strong></p>
+                        <div class="festival-actions">
+                            <button class="festival-btn primary">Submit Film</button>
+                            <button class="festival-btn secondary">Details</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="festival-card">
+                    <div class="festival-banner" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+                        <span class="festival-logo">🌴</span>
+                        <span class="festival-tier gold">A-List</span>
+                    </div>
+                    <div class="festival-content">
+                        <h3 class="festival-name">Cannes Film Festival</h3>
+                        <p class="festival-location">📍 Cannes, France</p>
+                        <div class="festival-stats">
+                            <span class="festival-stat"><strong>May 13-24</strong></span>
+                            <span class="festival-stat">Est. 1946</span>
+                        </div>
+                        <div class="match-score">
+                            <div class="match-bar"><div class="match-fill medium" style="width: 62%"></div></div>
+                            <span class="match-percent medium">62%</span>
+                        </div>
+                        <div class="festival-tags">
+                            <span class="tag">International</span>
+                            <span class="tag">Arthouse</span>
+                            <span class="tag">Premiere</span>
+                        </div>
+                        <p class="festival-deadline">⏰ Deadline: <strong>Mar 1, 2025</strong></p>
+                        <div class="festival-actions">
+                            <button class="festival-btn primary">Submit Film</button>
+                            <button class="festival-btn secondary">Details</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="festival-card">
+                    <div class="festival-banner" style="background: linear-gradient(135deg, #059669, #047857);">
+                        <span class="festival-logo">🎭</span>
+                        <span class="festival-tier gold">A-List</span>
+                    </div>
+                    <div class="festival-content">
+                        <h3 class="festival-name">Toronto International</h3>
+                        <p class="festival-location">📍 Toronto, Canada</p>
+                        <div class="festival-stats">
+                            <span class="festival-stat"><strong>Sep 4-14</strong></span>
+                            <span class="festival-stat">Est. 1976</span>
+                        </div>
+                        <div class="match-score">
+                            <div class="match-bar"><div class="match-fill high" style="width: 85%"></div></div>
+                            <span class="match-percent high">85%</span>
+                        </div>
+                        <div class="festival-tags">
+                            <span class="tag">World Cinema</span>
+                            <span class="tag">Drama</span>
+                            <span class="tag">Industry</span>
+                        </div>
+                        <p class="festival-deadline">⏰ Deadline: <strong>Jun 15, 2025</strong></p>
+                        <div class="festival-actions">
+                            <button class="festival-btn primary">Submit Film</button>
+                            <button class="festival-btn secondary">Details</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="festival-card">
+                    <div class="festival-banner" style="background: linear-gradient(135deg, #7c3aed, #5b21b6);">
+                        <span class="festival-logo">🎪</span>
+                        <span class="festival-tier silver">Regional</span>
+                    </div>
+                    <div class="festival-content">
+                        <h3 class="festival-name">SXSW Film Festival</h3>
+                        <p class="festival-location">📍 Austin, Texas, USA</p>
+                        <div class="festival-stats">
+                            <span class="festival-stat"><strong>Mar 7-15</strong></span>
+                            <span class="festival-stat">Est. 1987</span>
+                        </div>
+                        <div class="match-score">
+                            <div class="match-bar"><div class="match-fill high" style="width: 91%"></div></div>
+                            <span class="match-percent high">91%</span>
+                        </div>
+                        <div class="festival-tags">
+                            <span class="tag">Emerging</span>
+                            <span class="tag">Tech</span>
+                            <span class="tag">Innovation</span>
+                        </div>
+                        <p class="festival-deadline">⏰ Deadline: <strong>Oct 20, 2025</strong></p>
+                        <div class="festival-actions">
+                            <button class="festival-btn primary">Submit Film</button>
+                            <button class="festival-btn secondary">Details</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="festival-card">
+                    <div class="festival-banner" style="background: linear-gradient(135deg, #0891b2, #0e7490);">
+                        <span class="festival-logo">🎞️</span>
+                        <span class="festival-tier gold">A-List</span>
+                    </div>
+                    <div class="festival-content">
+                        <h3 class="festival-name">Berlin International</h3>
+                        <p class="festival-location">📍 Berlin, Germany</p>
+                        <div class="festival-stats">
+                            <span class="festival-stat"><strong>Feb 13-23</strong></span>
+                            <span class="festival-stat">Est. 1951</span>
+                        </div>
+                        <div class="match-score">
+                            <div class="match-bar"><div class="match-fill high" style="width: 74%"></div></div>
+                            <span class="match-percent high">74%</span>
+                        </div>
+                        <div class="festival-tags">
+                            <span class="tag">Political</span>
+                            <span class="tag">European</span>
+                            <span class="tag">Art Cinema</span>
+                        </div>
+                        <p class="festival-deadline">⏰ Deadline: <strong>Oct 1, 2025</strong></p>
+                        <div class="festival-actions">
+                            <button class="festival-btn primary">Submit Film</button>
+                            <button class="festival-btn secondary">Details</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="festival-card">
+                    <div class="festival-banner" style="background: linear-gradient(135deg, #db2777, #be185d);">
+                        <span class="festival-logo">🇬🇧</span>
+                        <span class="festival-tier silver">Regional</span>
+                    </div>
+                    <div class="festival-content">
+                        <h3 class="festival-name">BFI London Film Festival</h3>
+                        <p class="festival-location">📍 London, UK</p>
+                        <div class="festival-stats">
+                            <span class="festival-stat"><strong>Oct 9-20</strong></span>
+                            <span class="festival-stat">Est. 1957</span>
+                        </div>
+                        <div class="match-score">
+                            <div class="match-bar"><div class="match-fill high" style="width: 88%"></div></div>
+                            <span class="match-percent high">88%</span>
+                        </div>
+                        <div class="festival-tags">
+                            <span class="tag">British</span>
+                            <span class="tag">International</span>
+                            <span class="tag">Diverse</span>
+                        </div>
+                        <p class="festival-deadline">⏰ Deadline: <strong>Jun 1, 2025</strong></p>
+                        <div class="festival-actions">
+                            <button class="festival-btn primary">Submit Film</button>
+                            <button class="festival-btn secondary">Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

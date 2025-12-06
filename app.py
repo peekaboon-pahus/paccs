@@ -768,6 +768,9 @@ def get_filmmakers():
 @app.route('/my-films')
 def my_films_page(): return render_template('my-films.html')
 
+@app.route('/festivals')
+def festivals_page(): return render_template('festivals.html')
+
 @app.route('/api/admin/profiles')
 def admin_get_profiles():
     profiles = load_profiles()
