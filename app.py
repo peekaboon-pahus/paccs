@@ -203,6 +203,9 @@ def winners_page(): return render_template('winners.html')
 @app.route('/admin-judging')
 def admin_judging_page(): return render_template('admin_judging.html')
 
+@app.route('/script-analysis')
+def script_analysis_page(): return render_template('script-analysis.html')
+
 # ============================================
 # API ROUTES - FILMS & ANALYSIS
 # ============================================
