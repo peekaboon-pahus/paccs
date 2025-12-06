@@ -170,7 +170,7 @@
                 // Sign out so they must verify first
                 await firebase.auth().signOut();
                 
-                successMsg.innerHTML = '🎉 Account created! Please check your email and click the verification link to activate your account.';
+               successMsg.innerHTML = '🎉 Account created!<br><br>📧 Please check your email and click the verification link.<br><br>⚠️ <strong>Don\'t see it? Check your spam/junk folder.</strong> The email comes from noreply@paccs-platform.firebaseapp.com';
                 successMsg.style.display = 'block';
                 btn.innerHTML = 'Verification Email Sent ✓';
                 
