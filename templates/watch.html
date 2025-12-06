@@ -128,9 +128,6 @@
                 </div>`;
         }
         
-@app.route('/streaming')
-def streaming_page(): return render_template('watch.html')
-
         function searchFilms() {
             const q = document.getElementById('searchInput').value.toLowerCase();
             renderFilms(q ? allFilms.filter(f => f.title.toLowerCase().includes(q) || (f.filmmaker || '').toLowerCase().includes(q)) : allFilms);

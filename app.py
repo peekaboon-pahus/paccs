@@ -800,6 +800,9 @@ def admin_feature(profile_id):
         return jsonify({'success': True})
     return jsonify({'success': False}), 404
 
+@app.route('/streaming')
+def streaming_page(): return render_template('watch.html')
+
 # ============================================
 # API ROUTES - PDF
 # ============================================
