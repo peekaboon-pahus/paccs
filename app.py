@@ -765,6 +765,9 @@ def get_filmmakers():
 # API ROUTES - ADMIN
 # ============================================
 
+@app.route('/my-films')
+def my_films_page(): return render_template('my-films.html')
+
 @app.route('/api/admin/profiles')
 def admin_get_profiles():
     profiles = load_profiles()

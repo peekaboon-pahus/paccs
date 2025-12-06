@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Films | PACCS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #fff; min-height: 100vh; }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar { width: 240px; background: #0f0f15; border-right: 1px solid rgba(255,255,255,0.1); padding: 24px 16px; position: fixed; height: 100vh; }
+        .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #a855f7, #22c55e); border-radius: 10px; }
+        .logo span { font-size: 20px; font-weight: 700; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; color: rgba(255,255,255,0.6); text-decoration: none; margin-bottom: 4px; font-size: 14px; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-item.active { background: rgba(168,85,247,0.15); color: #a855f7; }
+        .nav-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); padding: 16px 16px 8px; text-transform: uppercase; }
+        .main { flex: 1; margin-left: 240px; padding: 32px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .header-left h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .header-left p { color: rgba(255,255,255,0.6); }
+        .add-btn { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .add-btn:hover { box-shadow: 0 4px 20px rgba(168,85,247,0.4); }
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+        .stat-card { background: #1a1a2e; border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .stat-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .stat-value.purple { color: #a855f7; }
+        .stat-value.green { color: #22c55e; }
+        .stat-value.blue { color: #3b82f6; }
+        .stat-value.yellow { color: #f59e0b; }
+        .stat-label { font-size: 13px; color: rgba(255,255,255,0.5); }
+        .films-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .film-card { background: #1a1a2e; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s; }
+        .film-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); border-color: rgba(168,85,247,0.3); }
+        .film-thumbnail { height: 160px; background: linear-gradient(135deg, #2a2a4e, #1a1a2e); display: flex; align-items: center; justify-content: center; font-size: 48px; position: relative; }
+        .film-status { position: absolute; top: 12px; right: 12px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .film-status.analyzing { background: rgba(168,85,247,0.2); color: #a855f7; }
+        .film-status.complete { background: rgba(34,197,94,0.2); color: #22c55e; }
+        .film-status.streaming { background: rgba(59,130,246,0.2); color: #3b82f6; }
+        .film-content { padding: 20px; }
+        .film-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .film-meta { display: flex; gap: 16px; margin-bottom: 16px; font-size: 13px; color: rgba(255,255,255,0.5); }
+        .film-score { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+        .score-badge { background: linear-gradient(135deg, #a855f7, #7c3aed); padding: 6px 12px; border-radius: 8px; font-size: 14px; font-weight: 700; }
+        .score-text { font-size: 13px; color: rgba(255,255,255,0.5); }
+        .film-actions { display: flex; gap: 8px; }
+        .film-btn { flex: 1; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; }
+        .film-btn.primary { background: rgba(168,85,247,0.15); color: #a855f7; }
+        .film-btn.secondary { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); }
+        .empty-state { text-align: center; padding: 80px 40px; background: #1a1a2e; border-radius: 16px; border: 2px dashed rgba(255,255,255,0.1); }
+        .empty-icon { font-size: 64px; margin-bottom: 20px; }
+        .empty-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+        .empty-text { color: rgba(255,255,255,0.5); margin-bottom: 24px; }
+        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; } .stats-row { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo"><div class="logo-icon"></div><span>PACCS</span></div>
+            <a href="/dashboard" class="nav-item">📊 Dashboard</a>
+            <a href="/my-films" class="nav-item active">🎬 My Films</a>
+            <div class="nav-label">Analysis</div>
+            <a href="/trailer-analysis" class="nav-item">🎥 Trailer Analysis</a>
+            <a href="/script-analysis" class="nav-item">📝 Script Analysis</a>
+            <div class="nav-label">Discover</div>
+            <a href="/festivals" class="nav-item">🏆 Festivals</a>
+            <a href="/distributors" class="nav-item">🌍 Distributors</a>
+            <div class="nav-label">Monetize</div>
+            <a href="/streaming" class="nav-item">▶️ Streaming</a>
+            <a href="/earnings" class="nav-item">💰 Earnings</a>
+        </aside>
+        
+        <main class="main">
+            <div class="header">
+                <div class="header-left">
+                    <h1>🎬 My Films</h1>
+                    <p>Manage and track all your film projects</p>
+                </div>
+                <button class="add-btn" onclick="window.location.href='/trailer-analysis'">
+                    <span>+</span> Add New Film
+                </button>
+            </div>
+            
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value purple">3</div>
+                    <div class="stat-label">Total Films</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value green">2</div>
+                    <div class="stat-label">Analyzed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value blue">1</div>
+                    <div class="stat-label">Streaming</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value yellow">£127</div>
+                    <div class="stat-label">Total Earnings</div>
+                </div>
+            </div>
+            
+            <div class="films-grid" id="films-grid">
+                <div class="film-card">
+                    <div class="film-thumbnail">
+                        🎬
+                        <span class="film-status streaming">Streaming</span>
+                    </div>
+                    <div class="film-content">
+                        <h3 class="film-title">Second Home</h3>
+                        <div class="film-meta">
+                            <span>Feature • 94 min</span>
+                            <span>Drama</span>
+                        </div>
+                        <div class="film-score">
+                            <span class="score-badge">78</span>
+                            <span class="score-text">PACCS Score • Festival Ready</span>
+                        </div>
+                        <div class="film-actions">
+                            <button class="film-btn primary">View Details</button>
+                            <button class="film-btn secondary">Analytics</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="film-card">
+                    <div class="film-thumbnail">
+                        🎥
+                        <span class="film-status complete">Analyzed</span>
+                    </div>
+                    <div class="film-content">
+                        <h3 class="film-title">The Last Light</h3>
+                        <div class="film-meta">
+                            <span>Short • 18 min</span>
+                            <span>Thriller</span>
+                        </div>
+                        <div class="film-score">
+                            <span class="score-badge">82</span>
+                            <span class="score-text">PACCS Score • High Potential</span>
+                        </div>
+                        <div class="film-actions">
+                            <button class="film-btn primary">View Details</button>
+                            <button class="film-btn secondary">Submit to Festivals</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="film-card">
+                    <div class="film-thumbnail">
+                        ⏳
+                        <span class="film-status analyzing">Analyzing</span>
+                    </div>
+                    <div class="film-content">
+                        <h3 class="film-title">Untitled Project</h3>
+                        <div class="film-meta">
+                            <span>Feature • 102 min</span>
+                            <span>Sci-Fi</span>
+                        </div>
+                        <div class="film-score">
+                            <span class="score-badge" style="background: rgba(255,255,255,0.1);">--</span>
+                            <span class="score-text">Analysis in progress...</span>
+                        </div>
+                        <div class="film-actions">
+                            <button class="film-btn secondary" style="flex:1">View Progress</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
